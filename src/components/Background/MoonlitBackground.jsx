@@ -37,10 +37,8 @@ const cats = [
 ]
 
 const CatSVG = ({ flip }) => (
-  <svg
-    width="48" height="48" viewBox="0 0 48 48"
-    style={{ transform: flip ? "scaleX(-1)" : "none" }}
-  >
+  <svg width="48" height="48" viewBox="0 0 48 48"
+    style={{ transform: flip ? "scaleX(-1)" : "none" }}>
     <ellipse cx="24" cy="34" rx="13" ry="10" fill="#1a1a3e" />
     <circle cx="24" cy="20" r="10" fill="#1a1a3e" />
     <polygon points="15,13 11,4 20,11" fill="#1a1a3e" />
@@ -98,10 +96,8 @@ export default function MoonlitBackground() {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 110,
-          height: 110,
-          top: "8%",
-          left: "70%",
+          width: 110, height: 110,
+          top: "8%", left: "70%",
           background: "radial-gradient(circle at 35% 35%, #fffde7, #ffd54f)",
           boxShadow: "0 0 60px 20px rgba(255,213,79,0.25), 0 0 120px 40px rgba(255,213,79,0.1)",
         }}
@@ -135,61 +131,52 @@ export default function MoonlitBackground() {
       {/* Castle Silhouette */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 320" preserveAspectRatio="none" style={{ width: "100%", height: "320px" }}>
-          {/* Water */}
           <rect x="0" y="260" width="1440" height="60" fill="#0d1f3c" opacity="0.9" />
-          <motion.ellipse
-            cx="720" cy="265" rx="300" ry="12"
-            fill="#c8a8e9" opacity="0.15"
-            animate={{ rx: [300, 330, 300] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
-          {/* Moon reflection */}
-          <motion.ellipse
-            cx="1020" cy="275" rx="30" ry="6"
-            fill="#ffd54f" opacity="0.3"
-            animate={{ opacity: [0.2, 0.5, 0.2] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          />
-          {/* Castle body */}
+          <ellipse cx="720" cy="265" rx="300" ry="12" fill="#c8a8e9" opacity="0.15" />
           <rect x="560" y="120" width="320" height="150" fill="#070d24" />
-          {/* Main tower */}
           <rect x="660" y="60" width="120" height="170" fill="#070d24" />
           <polygon points="660,60 720,10 780,60" fill="#0a1030" />
-          {/* Left tower */}
           <rect x="580" y="100" width="70" height="130" fill="#070d24" />
           <polygon points="580,100 615,60 650,100" fill="#0a1030" />
-          {/* Right tower */}
           <rect x="790" y="100" width="70" height="130" fill="#070d24" />
           <polygon points="790,100 825,60 860,100" fill="#0a1030" />
-          {/* Battlements */}
           {[560, 580, 600, 620, 640, 660, 700, 740, 780, 820, 840, 860].map((x, i) => (
             <rect key={i} x={x} y="118" width="14" height="16" fill="#070d24" />
           ))}
-          {/* Glowing windows */}
-          <motion.rect
-            x="700" y="100" width="20" height="28" rx="10" fill="#ffd54f"
+          <motion.rect x="700" y="100" width="20" height="28" rx="10" fill="#ffd54f"
             animate={{ opacity: [0.6, 1, 0.6] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
-          <motion.rect
-            x="620" y="130" width="16" height="22" rx="8" fill="#c8a8e9"
+          <motion.rect x="620" y="130" width="16" height="22" rx="8" fill="#c8a8e9"
             animate={{ opacity: [0.5, 0.9, 0.5] }}
             transition={{ duration: 3, repeat: Infinity, delay: 1 }}
           />
-          <motion.rect
-            x="804" y="130" width="16" height="22" rx="8" fill="#c8a8e9"
+          <motion.rect x="804" y="130" width="16" height="22" rx="8" fill="#c8a8e9"
             animate={{ opacity: [0.5, 0.9, 0.5] }}
             transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
           />
-          {/* Gate */}
           <rect x="695" y="200" width="50" height="70" rx="25" fill="#020818" />
-          {/* Trees */}
           <ellipse cx="480" cy="220" rx="35" ry="55" fill="#050c20" />
           <ellipse cx="960" cy="220" rx="35" ry="55" fill="#050c20" />
           <ellipse cx="430" cy="240" rx="25" ry="40" fill="#070d24" />
           <ellipse cx="1010" cy="240" rx="25" ry="40" fill="#070d24" />
         </svg>
       </div>
+
+      {/* Moon reflection — div instead of SVG ellipse */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          bottom: "8%",
+          left: "70%",
+          width: 60,
+          height: 12,
+          background: "#ffd54f",
+          filter: "blur(4px)",
+        }}
+        animate={{ opacity: [0.2, 0.5, 0.2] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      />
 
       {/* Sparkling water */}
       {Array.from({ length: 12 }).map((_, i) => (
@@ -216,8 +203,7 @@ export default function MoonlitBackground() {
           style={{
             left: `${random(5, 95)}%`,
             top: `${random(40, 75)}%`,
-            width: 4,
-            height: 4,
+            width: 4, height: 4,
             background: "#ffd54f",
             boxShadow: "0 0 6px 2px rgba(255,213,79,0.6)",
           }}
