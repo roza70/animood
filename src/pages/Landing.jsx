@@ -479,4 +479,4 @@ export default function Landing({ onLogin }) {
     </div>
   )
 }
-//login
+//login and character
