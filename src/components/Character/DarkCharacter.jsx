@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import princess from "../../assets/princess.mp4"
 
 const quotes = [
@@ -16,6 +16,13 @@ const quotes = [
 export default function DarkCharacter() {
   const [currentQuote, setCurrentQuote] = useState(0)
   const [showQuote, setShowQuote] = useState(true)
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 2
+    }
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,17 +37,13 @@ export default function DarkCharacter() {
 
   return (
     <div className="fixed inset-0 z-10">
-      {/* Full screen video */}
-      <motion.video
+      <video
+        ref={videoRef}
         src={princess}
         autoPlay
         loop
         muted
         playsInline
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
-        onLoadedMetadata={(e) => { e.target.currentTime = 1 }}
         style={{
           width: "100%",
           height: "100%",
@@ -48,16 +51,16 @@ export default function DarkCharacter() {
           position: "absolute",
           top: 0,
           left: 0,
+          transform: "scale(1.15)",
+          transformOrigin: "center center",
         }}
       />
 
-      {/* Dark overlay */}
       <div
         className="absolute inset-0"
         style={{ background: "linear-gradient(to top, rgba(2,8,24,0.6) 0%, rgba(2,8,24,0.05) 50%, rgba(2,8,24,0.2) 100%)" }}
       />
 
-      {/* Quote bubble */}
       <div className="absolute z-20" style={{ top: "8%", left: "32%" }}>
         <AnimatePresence mode="wait">
           {showQuote && (
@@ -69,7 +72,6 @@ export default function DarkCharacter() {
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
               style={{ position: "relative" }}
             >
-              {/* Thought bubble tail dots */}
               <div style={{
                 position: "absolute",
                 bottom: -20, right: 20,
@@ -87,7 +89,6 @@ export default function DarkCharacter() {
                 ))}
               </div>
 
-              {/* Main bubble */}
               <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -112,8 +113,6 @@ export default function DarkCharacter() {
                 }}>
                   "{quotes[currentQuote]}"
                 </p>
-
-                {/* Sparkles */}
                 {[
                   { top: -10, right: 10 },
                   { top: -6, right: 40 },

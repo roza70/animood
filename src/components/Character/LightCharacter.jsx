@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import prince from "../../assets/prince.mp4"
 
 const quotes = [
@@ -15,7 +15,6 @@ const quotes = [
 
 const random = (min, max) => Math.random() * (max - min) + min
 
-// Wind effect petals
 const windPetals = Array.from({ length: 25 }, (_, i) => ({
   id: i,
   x: random(0, 100),
@@ -29,6 +28,13 @@ export default function LightCharacter() {
   const [currentQuote, setCurrentQuote] = useState(0)
   const [showQuote, setShowQuote] = useState(true)
   const [windActive, setWindActive] = useState(false)
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 2
+    }
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,7 +47,6 @@ export default function LightCharacter() {
     return () => clearInterval(interval)
   }, [])
 
-  // Wind effect every 8 seconds
   useEffect(() => {
     const windInterval = setInterval(() => {
       setWindActive(true)
@@ -52,16 +57,13 @@ export default function LightCharacter() {
 
   return (
     <div className="fixed inset-0 z-10">
-      {/* Full screen video */}
-      <motion.video
+      <video
+        ref={videoRef}
         src={prince}
         autoPlay
         loop
         muted
         playsInline
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
         style={{
           width: "100%",
           height: "100%",
@@ -69,20 +71,21 @@ export default function LightCharacter() {
           position: "absolute",
           top: 0,
           left: 0,
+          transform: "scale(1.15)",
+          transformOrigin: "center center",
         }}
       />
 
-      {/* Light overlay */}
-      <div className="absolute inset-0" style={{
-        background: "linear-gradient(to top, rgba(255,240,245,0.3) 0%, rgba(255,240,245,0.02) 50%, rgba(255,240,245,0.1) 100%)"
-      }} />
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to top, rgba(255,240,245,0.3) 0%, rgba(255,240,245,0.02) 50%, rgba(255,240,245,0.1) 100%)" }}
+      />
 
-      {/* Wind effect — petals blowing horizontally */}
       <AnimatePresence>
         {windActive && windPetals.map(petal => (
           <motion.div
             key={petal.id}
-            className="absolute rounded-full"
+            className="absolute"
             style={{
               left: `${petal.x}%`,
               top: `${random(10, 90)}%`,
@@ -100,16 +103,11 @@ export default function LightCharacter() {
               rotate: [0, random(180, 540)],
             }}
             exit={{ opacity: 0 }}
-            transition={{
-              duration: petal.duration,
-              delay: petal.delay * 0.3,
-              ease: "easeOut",
-            }}
+            transition={{ duration: petal.duration, delay: petal.delay * 0.3, ease: "easeOut" }}
           />
         ))}
       </AnimatePresence>
 
-      {/* Wind shimmer overlay */}
       <AnimatePresence>
         {windActive && (
           <motion.div
@@ -118,14 +116,11 @@ export default function LightCharacter() {
             animate={{ opacity: [0, 0.15, 0] }}
             exit={{ opacity: 0 }}
             transition={{ duration: 2 }}
-            style={{
-              background: "linear-gradient(to right, transparent, rgba(255,220,240,0.4), transparent)",
-            }}
+            style={{ background: "linear-gradient(to right, transparent, rgba(255,220,240,0.4), transparent)" }}
           />
         )}
       </AnimatePresence>
 
-      {/* Quote bubble — beside prince head */}
       <div className="absolute z-20" style={{ top: "8%", left: "5%" }}>
         <AnimatePresence mode="wait">
           {showQuote && (
@@ -137,15 +132,11 @@ export default function LightCharacter() {
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
               style={{ position: "relative" }}
             >
-              {/* Thought bubble tail dots */}
               <div style={{
                 position: "absolute",
-                bottom: -20,
-                left: 24,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 4,
+                bottom: -20, left: 24,
+                display: "flex", flexDirection: "column",
+                alignItems: "center", gap: 4,
               }}>
                 {[10, 7, 4].map((size, i) => (
                   <motion.div
@@ -158,7 +149,6 @@ export default function LightCharacter() {
                 ))}
               </div>
 
-              {/* Main bubble */}
               <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -183,7 +173,11 @@ export default function LightCharacter() {
                 }}>
                   "{quotes[currentQuote]}"
                 </p>
-                {[{ top: -10, left: 10 }, { top: -6, left: 40 }, { top: -12, left: 25 }].map((pos, i) => (
+                {[
+                  { top: -10, left: 10 },
+                  { top: -6, left: 40 },
+                  { top: -12, left: 25 },
+                ].map((pos, i) => (
                   <motion.span
                     key={i}
                     style={{ position: "absolute", ...pos, color: "#f4a7b9", fontSize: 11 }}
