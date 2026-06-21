@@ -40,6 +40,7 @@ export default function DarkCharacter() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5 }}
+        onLoadedMetadata={(e) => { e.target.currentTime = 1 }}
         style={{
           width: "100%",
           height: "100%",
@@ -51,11 +52,12 @@ export default function DarkCharacter() {
       />
 
       {/* Dark overlay */}
-      <div className="absolute inset-0" style={{
-        background: "linear-gradient(to top, rgba(2,8,24,0.6) 0%, rgba(2,8,24,0.05) 50%, rgba(2,8,24,0.2) 100%)"
-      }} />
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(to top, rgba(2,8,24,0.6) 0%, rgba(2,8,24,0.05) 50%, rgba(2,8,24,0.2) 100%)" }}
+      />
 
-      {/* Quote bubble — beside princess head top left */}
+      {/* Quote bubble */}
       <div className="absolute z-20" style={{ top: "8%", left: "32%" }}>
         <AnimatePresence mode="wait">
           {showQuote && (
@@ -70,12 +72,9 @@ export default function DarkCharacter() {
               {/* Thought bubble tail dots */}
               <div style={{
                 position: "absolute",
-                bottom: -20,
-                right: 20,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 4,
+                bottom: -20, right: 20,
+                display: "flex", flexDirection: "column",
+                alignItems: "center", gap: 4,
               }}>
                 {[10, 7, 4].map((size, i) => (
                   <motion.div
@@ -113,7 +112,13 @@ export default function DarkCharacter() {
                 }}>
                   "{quotes[currentQuote]}"
                 </p>
-                {[{ top: -10, right: 10 }, { top: -6, right: 40 }, { top: -12, right: 25 }].map((pos, i) => (
+
+                {/* Sparkles */}
+                {[
+                  { top: -10, right: 10 },
+                  { top: -6, right: 40 },
+                  { top: -12, right: 25 },
+                ].map((pos, i) => (
                   <motion.span
                     key={i}
                     style={{ position: "absolute", ...pos, color: "#ffd54f", fontSize: 11 }}
