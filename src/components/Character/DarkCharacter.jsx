@@ -30,6 +30,7 @@ export default function DarkCharacter() {
 
   return (
     <div className="fixed inset-0 z-10">
+      {/* Full screen video */}
       <motion.video
         src={princess}
         autoPlay
@@ -42,22 +43,20 @@ export default function DarkCharacter() {
         style={{
           width: "100%",
           height: "100%",
-          objectFit: "contain",
+          objectFit: "cover",
           position: "absolute",
           top: 0,
           left: 0,
-          background: "#020818",
         }}
       />
 
-      {/* Overlay */}
-      <div
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(to top, rgba(2,8,24,0.6) 0%, rgba(2,8,24,0.05) 50%, rgba(2,8,24,0.2) 100%)" }}
-      />
+      {/* Dark overlay */}
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(to top, rgba(2,8,24,0.6) 0%, rgba(2,8,24,0.05) 50%, rgba(2,8,24,0.2) 100%)"
+      }} />
 
-      {/* Quote bubble — left side beside her head */}
-      <div className="absolute z-20" style={{ top: "8%", left: "25%" }}>
+      {/* Quote bubble — beside princess head top left */}
+      <div className="absolute z-20" style={{ top: "8%", left: "32%" }}>
         <AnimatePresence mode="wait">
           {showQuote && (
             <motion.div
@@ -82,7 +81,7 @@ export default function DarkCharacter() {
                   <motion.div
                     key={i}
                     className="rounded-full"
-                    style={{ width: size, height: size, background: "rgba(200, 168, 233, 0.7)" }}
+                    style={{ width: size, height: size, background: "rgba(200,168,233,0.7)" }}
                     animate={{ opacity: [0.4, 1, 0.4] }}
                     transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
                   />
@@ -94,13 +93,13 @@ export default function DarkCharacter() {
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 style={{
-                  background: "rgba(10, 5, 40, 0.85)",
-                  border: "1.5px solid rgba(200, 168, 233, 0.5)",
+                  background: "rgba(10,5,40,0.85)",
+                  border: "1.5px solid rgba(200,168,233,0.5)",
                   borderRadius: "20px 20px 4px 20px",
                   padding: "14px 18px",
                   maxWidth: "240px",
                   backdropFilter: "blur(12px)",
-                  boxShadow: "0 0 30px rgba(200, 168, 233, 0.25), 0 0 60px rgba(200, 168, 233, 0.1)",
+                  boxShadow: "0 0 30px rgba(200,168,233,0.25)",
                   position: "relative",
                 }}
               >
@@ -114,13 +113,7 @@ export default function DarkCharacter() {
                 }}>
                   "{quotes[currentQuote]}"
                 </p>
-
-                {/* Sparkles */}
-                {[
-                  { top: -10, right: 10 },
-                  { top: -6, right: 40 },
-                  { top: -12, right: 25 },
-                ].map((pos, i) => (
+                {[{ top: -10, right: 10 }, { top: -6, right: 40 }, { top: -12, right: 25 }].map((pos, i) => (
                   <motion.span
                     key={i}
                     style={{ position: "absolute", ...pos, color: "#ffd54f", fontSize: 11 }}
