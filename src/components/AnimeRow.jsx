@@ -1,64 +1,75 @@
-import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { useTheme } from "../context/ThemeContext";
-import AnimeCard from "./AnimeCard";
+import { useState, useEffect, useRef } from "react"
+import { motion } from "framer-motion"
+import { useTheme } from "../context/ThemeContext"
+import AnimeCard from "./AnimeCard"
 
+export default function AnimeRow({ title, fetchFn, watchlist, onAdd, onRate, onNote, notes, emoji, onCardClick }) {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
+  const [anime, setAnime] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(true)
+  const [visible, setVisible] = useState(false)
+  const rowRef = useRef(null)
+  const containerRef = useRef(null)
 
-export default function AnimeRow({ title, fetchFn, watchlist, onAdd, onRate, onNote, notes, emoji }) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-  const [anime, setAnime] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const rowRef = useRef(null);
-
+  // Intersection observer — only load when row is visible
   useEffect(() => {
-    let cancelled = false;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !visible) setVisible(true)
+      },
+      { threshold: 0.1 }
+    )
+    if (containerRef.current) observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  // Fetch only when visible
+  useEffect(() => {
+    if (!visible) return
+    let cancelled = false
     const load = async () => {
       try {
-        setLoading(true);
-        const res = await fetchFn();
-        if (!cancelled) setAnime(res.data.data || []);
+        setLoading(true)
+        const res = await fetchFn()
+        if (!cancelled) setAnime(res.data.data || [])
       } catch (err) {
-        console.error(err);
+        console.error(err)
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setLoading(false)
       }
-    };
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    }
+    load()
+    return () => { cancelled = true }
+  }, [visible])
 
   const checkScroll = () => {
-    if (!rowRef.current) return;
-    setCanScrollLeft(rowRef.current.scrollLeft > 0);
+    if (!rowRef.current) return
+    setCanScrollLeft(rowRef.current.scrollLeft > 0)
     setCanScrollRight(
-      rowRef.current.scrollLeft <
-        rowRef.current.scrollWidth - rowRef.current.clientWidth - 10,
-    );
-  };
+      rowRef.current.scrollLeft < rowRef.current.scrollWidth - rowRef.current.clientWidth - 10
+    )
+  }
 
   const scroll = (dir) => {
     if (rowRef.current) {
-      rowRef.current.scrollBy({ left: dir * 500, behavior: "smooth" });
-      setTimeout(checkScroll, 400);
+      rowRef.current.scrollBy({ left: dir * 500, behavior: "smooth" })
+      setTimeout(checkScroll, 400)
     }
-  };
+  }
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.key === "ArrowRight") scroll(1);
-      if (e.key === "ArrowLeft") scroll(-1);
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, []);
+      if (e.key === "ArrowRight") scroll(1)
+      if (e.key === "ArrowLeft") scroll(-1)
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [])
 
-  const btnStyle = (visible) => ({
+  const btnStyle = (isVisible) => ({
     position: "absolute",
     top: "50%",
     transform: "translateY(-50%)",
@@ -67,7 +78,7 @@ export default function AnimeRow({ title, fetchFn, watchlist, onAdd, onRate, onN
     height: "clamp(32px, 4vw, 44px)",
     borderRadius: "50%",
     border: "none",
-    cursor: visible ? "pointer" : "default",
+    cursor: isVisible ? "pointer" : "default",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -76,13 +87,13 @@ export default function AnimeRow({ title, fetchFn, watchlist, onAdd, onRate, onN
     color: isDark ? "#c8a8e9" : "#e91e8c",
     boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
     backdropFilter: "blur(10px)",
-    opacity: visible ? 1 : 0,
+    opacity: isVisible ? 1 : 0,
     transition: "opacity 0.3s",
-    pointerEvents: visible ? "auto" : "none",
-  });
+    pointerEvents: isVisible ? "auto" : "none",
+  })
 
   return (
-    <div style={{ marginBottom: "clamp(24px, 4vw, 40px)" }}>
+    <div ref={containerRef} style={{ marginBottom: "clamp(24px, 4vw, 40px)" }}>
       {/* Row title */}
       <motion.h2
         initial={{ opacity: 0, x: -20 }}
@@ -114,7 +125,7 @@ export default function AnimeRow({ title, fetchFn, watchlist, onAdd, onRate, onN
           ‹
         </motion.button>
 
-        {/* Cards container */}
+        {/* Cards */}
         <div
           ref={rowRef}
           onScroll={checkScroll}
@@ -129,52 +140,46 @@ export default function AnimeRow({ title, fetchFn, watchlist, onAdd, onRate, onN
             scrollSnapType: "x mandatory",
           }}
         >
-          <style>{`
-            div::-webkit-scrollbar { display: none; }
-          `}</style>
+          <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
-          {loading
-            ? Array.from({ length: 10 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="flex-shrink-0"
-                  style={{
-                    width: "clamp(130px, 15vw, 180px)",
-                    aspectRatio: "2/3",
-                    borderRadius: "12px",
-                    flexShrink: 0,
-                    scrollSnapAlign: "start",
-                    background: isDark
-                      ? "rgba(200,168,233,0.1)"
-                      : "rgba(233,30,140,0.08)",
-                  }}
-                  animate={{ opacity: [0.4, 0.8, 0.4] }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    delay: i * 0.1,
-                  }}
+          {loading ? (
+            Array.from({ length: 10 }).map((_, i) => (
+              <motion.div
+                key={i}
+                style={{
+                  width: "clamp(130px, 15vw, 180px)",
+                  aspectRatio: "2/3",
+                  borderRadius: "12px",
+                  flexShrink: 0,
+                  scrollSnapAlign: "start",
+                  background: isDark ? "rgba(200,168,233,0.1)" : "rgba(233,30,140,0.08)",
+                }}
+                animate={{ opacity: [0.4, 0.8, 0.4] }}
+                transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+              />
+            ))
+          ) : (
+            anime.map((item, i) => (
+              <motion.div
+                key={item.mal_id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.03 }}
+                style={{ flexShrink: 0, scrollSnapAlign: "start" }}
+                onClick={() => onCardClick && onCardClick(item)}
+              >
+                <AnimeCard
+                  anime={item}
+                  onAdd={onAdd}
+                  onRate={onRate}
+                  onNote={onNote}
+                  isInWatchlist={watchlist?.some(w => w.mal_id === item.mal_id)}
+                  userNote={notes?.[item.mal_id]}
                 />
-              ))
-            : anime.map((item, i) => (
-                <motion.div
-                  key={item.mal_id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.03 }}
-                  style={{ flexShrink: 0, scrollSnapAlign: "start" }}
-                >
-                  <AnimeCard
-  anime={item}
-  onAdd={onAdd}
-  onRate={onRate}
-  onNote={onNote}
-  isInWatchlist={watchlist?.some(w => w.mal_id === item.mal_id)}
-  userNote={notes?.[item.mal_id]}
-/>
-                </motion.div>
-              ))}
+              </motion.div>
+            ))
+          )}
         </div>
 
         {/* Right arrow */}
@@ -188,46 +193,21 @@ export default function AnimeRow({ title, fetchFn, watchlist, onAdd, onRate, onN
         </motion.button>
       </div>
 
-      {/* Bottom scroll indicator dots */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 6,
-          marginTop: 8,
-        }}
-      >
-        <motion.div
-          style={{
-            height: 3,
-            borderRadius: 2,
-            background: isDark ? "#c8a8e9" : "#e91e8c",
-            transition: "all 0.3s",
-            width: canScrollLeft ? 20 : 40,
-            opacity: canScrollLeft ? 0.4 : 0.9,
-          }}
-        />
-        <motion.div
-          style={{
-            height: 3,
-            borderRadius: 2,
-            background: isDark ? "#c8a8e9" : "#e91e8c",
-            transition: "all 0.3s",
-            width: !canScrollLeft && canScrollRight ? 40 : 20,
-            opacity: !canScrollLeft && canScrollRight ? 0.9 : 0.4,
-          }}
-        />
-        <motion.div
-          style={{
-            height: 3,
-            borderRadius: 2,
-            background: isDark ? "#c8a8e9" : "#e91e8c",
-            transition: "all 0.3s",
-            width: !canScrollRight ? 40 : 20,
-            opacity: !canScrollRight ? 0.9 : 0.4,
-          }}
-        />
+      {/* Scroll indicator dots */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 8 }}>
+        {[canScrollLeft, (!canScrollLeft && canScrollRight), !canScrollRight].map((active, i) => (
+          <motion.div
+            key={i}
+            style={{
+              height: 3, borderRadius: 2,
+              background: isDark ? "#c8a8e9" : "#e91e8c",
+              transition: "all 0.3s",
+              width: active ? 40 : 20,
+              opacity: active ? 0.9 : 0.3,
+            }}
+          />
+        ))}
       </div>
     </div>
-  );
+  )
 }
