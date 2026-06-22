@@ -3,14 +3,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "../context/ThemeContext"
 import { searchAnime } from "../api/jikan"
 
-export default function Navbar({ user, onLogout, onSearch }) {
+export default function Navbar({ user, onLogout, onSearch, onMyList }) {
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === "dark"
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [scrolled, setScrolled] = useState(false)
 
-  // Detect scroll for navbar background
   useState(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
     window.addEventListener("scroll", handleScroll)
@@ -38,9 +37,7 @@ export default function Navbar({ user, onLogout, onSearch }) {
     justifyContent: "space-between",
     transition: "all 0.4s",
     background: scrolled
-      ? isDark
-        ? "rgba(2,8,24,0.95)"
-        : "rgba(255,240,245,0.95)"
+      ? isDark ? "rgba(2,8,24,0.95)" : "rgba(255,240,245,0.95)"
       : "linear-gradient(to bottom, rgba(0,0,0,0.5), transparent)",
     backdropFilter: scrolled ? "blur(20px)" : "none",
     borderBottom: scrolled
@@ -51,10 +48,7 @@ export default function Navbar({ user, onLogout, onSearch }) {
   return (
     <nav style={navStyle}>
       {/* Logo */}
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        style={{ cursor: "pointer" }}
-      >
+      <motion.div whileHover={{ scale: 1.05 }} style={{ cursor: "pointer" }}>
         <h1 style={{
           fontFamily: "Georgia, serif",
           fontSize: "clamp(18px, 3vw, 26px)",
@@ -67,11 +61,16 @@ export default function Navbar({ user, onLogout, onSearch }) {
         </h1>
       </motion.div>
 
-      {/* Nav links — desktop */}
+      {/* Nav links */}
       <div className="hidden md:flex items-center gap-6">
-        {["Home", "Browse", "My List"].map((item) => (
+        {[
+          { label: "Home", action: () => onMyList && onMyList(false) },
+          { label: "Browse", action: () => {} },
+          { label: "My List ♡", action: () => onMyList && onMyList(true) },
+        ].map((item) => (
           <motion.span
-            key={item}
+            key={item.label}
+            onClick={item.action}
             whileHover={{ scale: 1.05 }}
             style={{
               color: isDark ? "#c8a8e9" : "#e91e8c",
@@ -81,7 +80,7 @@ export default function Navbar({ user, onLogout, onSearch }) {
               opacity: 0.85,
             }}
           >
-            {item}
+            {item.label}
           </motion.span>
         ))}
       </div>
@@ -159,14 +158,32 @@ export default function Navbar({ user, onLogout, onSearch }) {
           {isDark ? "🌸 Sakura" : "🌙 Night"}
         </motion.button>
 
+        {/* My List button mobile */}
+        <motion.button
+          onClick={() => onMyList && onMyList(true)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="md:hidden"
+          style={{
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "18px",
+            color: isDark ? "#c8a8e9" : "#e91e8c",
+          }}
+        >
+          📋
+        </motion.button>
+
         {/* User + logout */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{
-            color: isDark ? "#c8a8e9" : "#e91e8c",
-            fontSize: "clamp(11px, 1.5vw, 13px)",
-            display: "none",
-          }}
+          <span
             className="md:block"
+            style={{
+              color: isDark ? "#c8a8e9" : "#e91e8c",
+              fontSize: "clamp(11px, 1.5vw, 13px)",
+              display: "none",
+            }}
           >
             ✦ {user?.name}
           </span>

@@ -2,14 +2,28 @@ import axios from "axios"
 
 const BASE = "https://api.jikan.moe/v4"
 
-export const getTrending = () => axios.get(`${BASE}/top/anime?filter=airing&limit=20`)
-export const getTopRated = () => axios.get(`${BASE}/top/anime?filter=bypopularity&limit=20`)
-export const getNewReleases = () => axios.get(`${BASE}/seasons/now?limit=20`)
-export const getByGenre = (genreId) => axios.get(`${BASE}/anime?genres=${genreId}&order_by=score&limit=20`)
-export const searchAnime = (query) => axios.get(`${BASE}/anime?q=${query}&limit=20`)
-export const getAnimeById = (id) => axios.get(`${BASE}/anime/${id}`)
+const delay = (ms) => new Promise(res => setTimeout(res, ms))
 
-// All Genre IDs from MyAnimeList
+const cache = {}
+
+const fetchWithCache = async (url) => {
+  if (cache[url]) return cache[url]
+  const res = await axios.get(url)
+  cache[url] = res
+  return res
+}
+
+export const getTrending = () => fetchWithCache(`${BASE}/top/anime?filter=airing&limit=25`)
+export const getTopRated = () => fetchWithCache(`${BASE}/top/anime?filter=bypopularity&limit=25`)
+export const getNewReleases = () => fetchWithCache(`${BASE}/seasons/now?limit=25`)
+export const getAnimeById = (id) => fetchWithCache(`${BASE}/anime/${id}`)
+export const searchAnime = (query) => axios.get(`${BASE}/anime?q=${query}&limit=25`)
+
+export const getByGenre = async (genreId) => {
+  await delay(500)
+  return fetchWithCache(`${BASE}/anime?genres=${genreId}&order_by=score&sort=desc&limit=25&page=1`)
+}
+
 export const GENRES = {
   action: 1,
   adventure: 2,
@@ -25,12 +39,11 @@ export const GENRES = {
   supernatural: 37,
   thriller: 41,
   isekai: 62,
-  mahou: 16,      // magical girls
+  magic: 16,
   mecha: 18,
   music: 19,
   psychological: 40,
   vampire: 32,
-  ecchi: 9,
   harem: 35,
   historical: 13,
   military: 38,
@@ -40,20 +53,21 @@ export const GENRES = {
   samurai: 21,
   school: 23,
   space: 29,
+  shounen: 27,
+  shoujo: 25,
 }
 
-// Mood to genre mapping
 export const MOOD_GENRES = {
-  happy: [4, 36],         // comedy, slice of life
-  sad: [8, 40],           // drama, psychological
-  excited: [1, 2],        // action, adventure
-  romantic: [22, 8],      // romance, drama
-  scared: [14, 37],       // horror, supernatural
-  cozy: [36, 4],          // slice of life, comedy
-  epic: [10, 24],         // fantasy, sci-fi
-  nostalgic: [13, 23],    // historical, school
-  curious: [7, 40],       // mystery, psychological
-  power: [1, 62],         // action, isekai
-  magical: [16, 10],      // mahou shoujo, fantasy
-  dark: [40, 14],         // psychological, horror
+  happy: [4, 36],
+  sad: [8, 40],
+  excited: [1, 2],
+  romantic: [22, 8],
+  scared: [14, 37],
+  cozy: [36, 4],
+  epic: [10, 24],
+  nostalgic: [13, 23],
+  curious: [7, 40],
+  power: [1, 62],
+  magical: [16, 10],
+  dark: [40, 14],
 }
