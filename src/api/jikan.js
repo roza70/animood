@@ -1,27 +1,52 @@
 import axios from "axios"
 
 const BASE = "https://api.jikan.moe/v4"
-
-const delay = (ms) => new Promise(res => setTimeout(res, ms))
-
 const cache = {}
 
-const fetchWithCache = async (url) => {
+const sleep = (ms) => new Promise(res => setTimeout(res, ms))
+
+const fetchWithCache = async (url, retries = 3) => {
   if (cache[url]) return cache[url]
-  const res = await axios.get(url)
-  cache[url] = res
-  return res
+  for (let i = 0; i < retries; i++) {
+    try {
+      await sleep(i * 600)
+      const res = await axios.get(url)
+      cache[url] = res
+      return res
+    } catch (err) {
+      if (err.response?.status === 429) {
+        await sleep(2000 * (i + 1))
+        continue
+      }
+      throw err
+    }
+  }
 }
 
-export const getTrending = () => fetchWithCache(`${BASE}/top/anime?filter=airing&limit=25`)
-export const getTopRated = () => fetchWithCache(`${BASE}/top/anime?filter=bypopularity&limit=25`)
-export const getNewReleases = () => fetchWithCache(`${BASE}/seasons/now?limit=25`)
-export const getAnimeById = (id) => fetchWithCache(`${BASE}/anime/${id}`)
-export const searchAnime = (query) => axios.get(`${BASE}/anime?q=${query}&limit=25`)
+export const getTrending = (page = 1) =>
+  fetchWithCache(`${BASE}/top/anime?filter=airing&limit=25&page=${page}`)
 
-export const getByGenre = async (genreId) => {
-  await delay(500)
-  return fetchWithCache(`${BASE}/anime?genres=${genreId}&order_by=score&sort=desc&limit=25&page=1`)
+export const getTopRated = (page = 1) =>
+  fetchWithCache(`${BASE}/top/anime?filter=bypopularity&limit=25&page=${page}`)
+
+export const getNewReleases = (page = 1) =>
+  fetchWithCache(`${BASE}/seasons/now?limit=25&page=${page}`)
+
+export const getAnimeById = (id) =>
+  fetchWithCache(`${BASE}/anime/${id}/full`)
+
+export const getAnimeCharacters = (id) =>
+  fetchWithCache(`${BASE}/anime/${id}/characters`)
+
+export const getAnimeEpisodes = (id, page = 1) =>
+  fetchWithCache(`${BASE}/anime/${id}/episodes?page=${page}`)
+
+export const searchAnime = (query, page = 1) =>
+  axios.get(`${BASE}/anime?q=${query}&limit=25&page=${page}`)
+
+export const getByGenre = async (genreId, page = 1) => {
+  await sleep(300)
+  return fetchWithCache(`${BASE}/anime?genres=${genreId}&order_by=score&sort=desc&limit=25&page=${page}`)
 }
 
 export const GENRES = {

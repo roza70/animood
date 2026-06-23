@@ -6,10 +6,18 @@ import { motion, AnimatePresence } from "framer-motion"
 
 function AppContent() {
   const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const saved = localStorage.getItem("animood_user")
-    if (saved) setUser(JSON.parse(saved))
+    if (saved) {
+      try {
+        setUser(JSON.parse(saved))
+      } catch (e) {
+        localStorage.removeItem("animood_user")
+      }
+    }
+    setLoading(false)
   }, [])
 
   const handleLogin = (userData) => {
@@ -20,6 +28,28 @@ function AppContent() {
     localStorage.removeItem("animood_user")
     setUser(null)
   }
+
+  if (loading) return (
+    <div style={{
+      position: "fixed", inset: 0,
+      background: "#020818",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}>
+      <motion.h1
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 2, repeat: Infinity }}
+        style={{
+          fontFamily: "Georgia, serif",
+          fontSize: "32px",
+          color: "#c8a8e9",
+        }}
+      >
+        ✦ AniMood
+      </motion.h1>
+    </div>
+  )
 
   return (
     <AnimatePresence mode="wait">
