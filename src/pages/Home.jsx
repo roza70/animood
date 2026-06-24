@@ -1,4 +1,5 @@
 import MyList from "./MyList"
+import Browse from "./Browse"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "../context/ThemeContext"
@@ -22,6 +23,7 @@ export default function Home({ user, onLogout }) {
   const [moodLoading, setMoodLoading] = useState(false)
   const [searchResults, setSearchResults] = useState(null)
   const [showMyList, setShowMyList] = useState(false)
+  const [showBrowse, setShowBrowse] = useState(false)
   const [selectedAnime, setSelectedAnime] = useState(null)
   const [watchlist, setWatchlist] = useState(() => {
     return JSON.parse(localStorage.getItem(`animood_watchlist_${user?.email}`) || "[]")
@@ -39,10 +41,19 @@ export default function Home({ user, onLogout }) {
     setTimeout(() => setToast(null), 3000)
   }
 
+  const resetAll = () => {
+    setShowMyList(false)
+    setShowBrowse(false)
+    setSearchResults(null)
+    setSelectedMood(null)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   const handleMoodSelect = async (mood) => {
     setSelectedMood(mood)
     setSearchResults(null)
     setShowMyList(false)
+    setShowBrowse(false)
     setMoodLoading(true)
     try {
       const genreIds = MOOD_GENRES[mood.id]
@@ -87,11 +98,21 @@ export default function Home({ user, onLogout }) {
     setSearchResults(results)
     setSelectedMood(null)
     setShowMyList(false)
+    setShowBrowse(false)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const handleMyList = (show) => {
     setShowMyList(show)
+    setShowBrowse(false)
+    setSearchResults(null)
+    setSelectedMood(null)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleBrowse = () => {
+    setShowBrowse(true)
+    setShowMyList(false)
     setSearchResults(null)
     setSelectedMood(null)
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -99,6 +120,28 @@ export default function Home({ user, onLogout }) {
 
   const handleCardClick = (anime) => {
     setSelectedAnime(anime)
+  }
+
+  const overlayStyle = {
+    background: isDark ? "rgba(2,8,24,0.92)" : "rgba(255,240,245,0.92)",
+    backdropFilter: "blur(20px)",
+    minHeight: "100vh",
+    position: "relative",
+  }
+
+  const closeBtnStyle = {
+    position: "fixed",
+    top: "clamp(70px, 10vw, 90px)",
+    right: "clamp(12px, 3vw, 32px)",
+    zIndex: 200,
+    width: 40, height: 40,
+    borderRadius: "50%",
+    border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)",
+    background: isDark ? "rgba(10,5,40,0.9)" : "rgba(255,240,245,0.9)",
+    color: isDark ? "#c8a8e9" : "#e91e8c",
+    fontSize: "18px", cursor: "pointer",
+    backdropFilter: "blur(10px)",
+    display: "flex", alignItems: "center", justifyContent: "center",
   }
 
   return (
@@ -115,11 +158,13 @@ export default function Home({ user, onLogout }) {
           onLogout={onLogout}
           onSearch={handleSearch}
           onMyList={handleMyList}
+          onBrowse={handleBrowse}
+          onHome={resetAll}
         />
 
         <div style={{ paddingTop: "clamp(70px, 10vw, 100px)" }}>
 
-          {/* My List */}
+          {/* MY LIST */}
           <AnimatePresence mode="wait">
             {showMyList && (
               <motion.div
@@ -127,12 +172,13 @@ export default function Home({ user, onLogout }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                style={{
-                  background: isDark ? "rgba(2,8,24,0.92)" : "rgba(255,240,245,0.92)",
-                  backdropFilter: "blur(20px)",
-                  minHeight: "100vh",
-                }}
+                style={overlayStyle}
               >
+                <motion.button
+                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowMyList(false)}
+                  style={closeBtnStyle}
+                >✕</motion.button>
                 <MyList
                   user={user}
                   watchlist={watchlist}
@@ -145,7 +191,35 @@ export default function Home({ user, onLogout }) {
             )}
           </AnimatePresence>
 
-          {!showMyList && (
+          {/* BROWSE */}
+          <AnimatePresence mode="wait">
+            {showBrowse && (
+              <motion.div
+                key="browse"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                style={overlayStyle}
+              >
+                <motion.button
+                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowBrowse(false)}
+                  style={closeBtnStyle}
+                >✕</motion.button>
+                <Browse
+                  watchlist={watchlist}
+                  onAdd={handleAdd}
+                  onRate={handleRate}
+                  onNote={handleNote}
+                  notes={notes}
+                  onCardClick={handleCardClick}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* MAIN HOME */}
+          {!showMyList && !showBrowse && (
             <>
               {/* Hero section */}
               {!searchResults && !selectedMood && (
@@ -167,7 +241,7 @@ export default function Home({ user, onLogout }) {
                     transition={{ delay: 0.2 }}
                     style={{
                       color: isDark ? "#c8a8e9" : "#ffb7c5",
-                      fontSize: "clamp(11px, 1.5vw, 13px)",
+                      fontSize: "clamp(10px, 1.3vw, 13px)",
                       fontWeight: "700",
                       letterSpacing: "3px",
                       textTransform: "uppercase",
@@ -237,9 +311,7 @@ export default function Home({ user, onLogout }) {
                         boxShadow: isDark
                           ? "0 8px 30px rgba(200,168,233,0.4)"
                           : "0 8px 30px rgba(233,30,140,0.4)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
+                        display: "flex", alignItems: "center", gap: 10,
                       }}
                     >
                       ✦ Start Exploring Free →
@@ -248,7 +320,7 @@ export default function Home({ user, onLogout }) {
                     <motion.div
                       whileHover={{ scale: 1.03, y: -4 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => window.scrollTo({ top: window.innerHeight * 1.2, behavior: "smooth" })}
+                      onClick={handleBrowse}
                       style={{
                         padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)",
                         borderRadius: "16px",
@@ -260,12 +332,10 @@ export default function Home({ user, onLogout }) {
                         cursor: "pointer",
                         fontFamily: "Georgia, serif",
                         backdropFilter: "blur(10px)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
+                        display: "flex", alignItems: "center", gap: 10,
                       }}
                     >
-                      🎭 Pick Your Mood
+                      🎭 Browse All Anime
                     </motion.div>
                   </motion.div>
 
@@ -319,9 +389,7 @@ export default function Home({ user, onLogout }) {
                         fontSize: "clamp(16px, 2.5vw, 22px)",
                         color: isDark ? "#e8d5f5" : "#e91e8c",
                         margin: 0,
-                      }}>
-                        🔍 Search Results
-                      </h2>
+                      }}>🔍 Search Results</h2>
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         onClick={() => setSearchResults(null)}
@@ -332,9 +400,7 @@ export default function Home({ user, onLogout }) {
                           color: isDark ? "#c8a8e9" : "#e91e8c",
                           cursor: "pointer", fontSize: "13px",
                         }}
-                      >
-                        Clear ✕
-                      </motion.button>
+                      >Clear ✕</motion.button>
                     </div>
                     <div style={{
                       display: "grid",
@@ -383,15 +449,27 @@ export default function Home({ user, onLogout }) {
                       backdropFilter: "blur(16px)",
                     }}
                   >
-                    <h2 style={{
-                      fontFamily: "Georgia, serif",
-                      fontSize: "clamp(16px, 2.5vw, 22px)",
-                      color: isDark ? "#e8d5f5" : "#e91e8c",
-                      margin: "0 0 20px 0",
-                      paddingTop: 20,
-                    }}>
-                      {selectedMood.emoji} {selectedMood.label} Picks — just for you
-                    </h2>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 20, marginBottom: 20 }}>
+                      <h2 style={{
+                        fontFamily: "Georgia, serif",
+                        fontSize: "clamp(16px, 2.5vw, 22px)",
+                        color: isDark ? "#e8d5f5" : "#e91e8c",
+                        margin: 0,
+                      }}>
+                        {selectedMood.emoji} {selectedMood.label} Picks
+                      </h2>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        onClick={() => setSelectedMood(null)}
+                        style={{
+                          padding: "6px 16px", borderRadius: "20px",
+                          border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)",
+                          background: "transparent",
+                          color: isDark ? "#c8a8e9" : "#e91e8c",
+                          cursor: "pointer", fontSize: "13px",
+                        }}
+                      >Clear ✕</motion.button>
+                    </div>
 
                     {moodLoading ? (
                       <div style={{

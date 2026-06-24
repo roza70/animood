@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "../context/ThemeContext"
 import { searchAnime } from "../api/jikan"
 
-export default function Navbar({ user, onLogout, onSearch, onMyList }) {
+export default function Navbar({ user, onLogout, onSearch, onMyList, onBrowse, onHome }) {
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === "dark"
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useState(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
@@ -22,6 +23,8 @@ export default function Navbar({ user, onLogout, onSearch, onMyList }) {
     try {
       const res = await searchAnime(searchQuery)
       onSearch(res.data.data)
+      setSearchOpen(false)
+      setSearchQuery("")
     } catch (err) {
       console.error(err)
     }
@@ -45,10 +48,22 @@ export default function Navbar({ user, onLogout, onSearch, onMyList }) {
       : "none",
   }
 
+  const linkStyle = {
+    color: isDark ? "#c8a8e9" : "#e91e8c",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    opacity: 0.9,
+  }
+
   return (
     <nav style={navStyle}>
       {/* Logo */}
-      <motion.div whileHover={{ scale: 1.05 }} style={{ cursor: "pointer" }}>
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        onClick={() => onHome && onHome()}
+        style={{ cursor: "pointer", flexShrink: 0 }}
+      >
         <h1 style={{
           fontFamily: "Georgia, serif",
           fontSize: "clamp(18px, 3vw, 26px)",
@@ -61,24 +76,18 @@ export default function Navbar({ user, onLogout, onSearch, onMyList }) {
         </h1>
       </motion.div>
 
-      {/* Nav links */}
-      <div className="hidden md:flex items-center gap-6">
+      {/* Desktop Nav links */}
+      <div style={{ display: "flex", alignItems: "center", gap: "clamp(16px, 3vw, 28px)" }}>
         {[
-          { label: "Home", action: () => onMyList && onMyList(false) },
-          { label: "Browse", action: () => {} },
+          { label: "Home", action: () => onHome && onHome() },
+          { label: "Browse", action: () => onBrowse && onBrowse() },
           { label: "My List ♡", action: () => onMyList && onMyList(true) },
         ].map((item) => (
           <motion.span
             key={item.label}
             onClick={item.action}
             whileHover={{ scale: 1.05 }}
-            style={{
-              color: isDark ? "#c8a8e9" : "#e91e8c",
-              fontSize: "14px",
-              fontWeight: "500",
-              cursor: "pointer",
-              opacity: 0.85,
-            }}
+            style={linkStyle}
           >
             {item.label}
           </motion.span>
@@ -86,7 +95,7 @@ export default function Navbar({ user, onLogout, onSearch, onMyList }) {
       </div>
 
       {/* Right side */}
-      <div style={{ display: "flex", alignItems: "center", gap: "clamp(8px, 2vw, 16px)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "clamp(6px, 1.5vw, 14px)" }}>
 
         {/* Search */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -121,16 +130,12 @@ export default function Navbar({ user, onLogout, onSearch, onMyList }) {
               </motion.form>
             )}
           </AnimatePresence>
-
           <motion.button
             onClick={() => setSearchOpen(!searchOpen)}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             style={{
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "18px",
+              background: "transparent", border: "none",
+              cursor: "pointer", fontSize: "18px",
               color: isDark ? "#c8a8e9" : "#e91e8c",
             }}
           >
@@ -141,8 +146,7 @@ export default function Navbar({ user, onLogout, onSearch, onMyList }) {
         {/* Theme toggle */}
         <motion.button
           onClick={toggleTheme}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
           style={{
             background: isDark ? "rgba(200,168,233,0.15)" : "rgba(233,30,140,0.1)",
             border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)",
@@ -158,39 +162,35 @@ export default function Navbar({ user, onLogout, onSearch, onMyList }) {
           {isDark ? "🌸 Sakura" : "🌙 Night"}
         </motion.button>
 
-        {/* My List button mobile */}
+        {/* Mobile hamburger */}
         <motion.button
-          onClick={() => onMyList && onMyList(true)}
+          onClick={() => setMenuOpen(!menuOpen)}
           whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="md:hidden"
           style={{
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "18px",
+            background: "transparent", border: "none",
+            cursor: "pointer", fontSize: "22px",
             color: isDark ? "#c8a8e9" : "#e91e8c",
+            display: "flex", alignItems: "center",
           }}
+          className="md:hidden"
         >
-          📋
+          {menuOpen ? "✕" : "☰"}
         </motion.button>
 
-        {/* User + logout */}
+        {/* User + logout desktop */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span
+          <span style={{
+            color: isDark ? "#c8a8e9" : "#e91e8c",
+            fontSize: "clamp(11px, 1.5vw, 13px)",
+            display: "none",
+          }}
             className="md:block"
-            style={{
-              color: isDark ? "#c8a8e9" : "#e91e8c",
-              fontSize: "clamp(11px, 1.5vw, 13px)",
-              display: "none",
-            }}
           >
             ✦ {user?.name}
           </span>
           <motion.button
             onClick={onLogout}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             style={{
               padding: "6px 14px",
               borderRadius: "20px",
@@ -205,6 +205,44 @@ export default function Navbar({ user, onLogout, onSearch, onMyList }) {
           </motion.button>
         </div>
       </div>
+
+      {/* Mobile dropdown menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            style={{
+              position: "absolute",
+              top: "100%", left: 0, right: 0,
+              background: isDark ? "rgba(2,8,24,0.98)" : "rgba(255,240,245,0.98)",
+              backdropFilter: "blur(20px)",
+              padding: "16px 24px",
+              display: "flex", flexDirection: "column", gap: 16,
+              borderBottom: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(233,30,140,0.15)",
+            }}
+          >
+            {[
+              { label: "🏠 Home", action: () => { onHome && onHome(); setMenuOpen(false) } },
+              { label: "🔍 Browse", action: () => { onBrowse && onBrowse(); setMenuOpen(false) } },
+              { label: "📋 My List", action: () => { onMyList && onMyList(true); setMenuOpen(false) } },
+            ].map(item => (
+              <motion.span
+                key={item.label}
+                onClick={item.action}
+                whileHover={{ x: 6 }}
+                style={{ ...linkStyle, fontSize: "16px" }}
+              >
+                {item.label}
+              </motion.span>
+            ))}
+            <span style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "13px" }}>
+              ✦ {user?.name}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   )
 }
