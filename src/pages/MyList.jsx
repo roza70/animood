@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "../context/ThemeContext"
-import AnimeCard from "../components/AnimeCard"
 
 const RATING_TIERS = [
   { label: "Masterpiece", emoji: "👑", color: "#ffd700", desc: "Absolute perfection" },
@@ -11,7 +10,7 @@ const RATING_TIERS = [
   { label: "Worst", emoji: "💔", color: "#f44336", desc: "Not my thing" },
 ]
 
-export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
+export default function MyList({ user, watchlist, ratings, onAdd, onRate, onCardClick }) {
   const { theme } = useTheme()
   const isDark = theme === "dark"
   const [activeTab, setActiveTab] = useState("watchlist")
@@ -30,6 +29,80 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
     borderRadius: "20px",
     backdropFilter: "blur(10px)",
   }
+
+  const AnimeListCard = ({ anime, showRating }) => (
+    <motion.div
+      whileHover={{ scale: 1.03, y: -4 }}
+      whileTap={{ scale: 0.97 }}
+      onClick={() => onCardClick && onCardClick(anime)}
+      style={{
+        display: "flex", gap: 14, alignItems: "center",
+        padding: "12px 16px", borderRadius: "14px",
+        cursor: "pointer",
+        background: isDark ? "rgba(200,168,233,0.06)" : "rgba(233,30,140,0.04)",
+        border: isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(233,30,140,0.1)",
+        transition: "all 0.2s",
+        position: "relative",
+      }}
+    >
+      {/* Poster */}
+      <img
+        src={anime?.images?.jpg?.large_image_url || anime?.images?.jpg?.image_url}
+        alt={anime?.title}
+        style={{
+          width: 56, height: 80,
+          borderRadius: "8px",
+          objectFit: "cover",
+          flexShrink: 0,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+        }}
+      />
+
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{
+          color: isDark ? "#e8d5f5" : "#c2185b",
+          fontSize: "clamp(12px, 1.5vw, 14px)",
+          fontWeight: "700",
+          margin: "0 0 4px 0",
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+        }}>
+          {anime?.title_english || anime?.title}
+        </p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          {anime?.score && (
+            <span style={{ color: "#ffd700", fontSize: "11px", fontWeight: "600" }}>⭐ {anime.score}</span>
+          )}
+          {anime?.episodes && (
+            <span style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "11px" }}>{anime.episodes} eps</span>
+          )}
+          {anime?.genres?.slice(0, 2).map(g => (
+            <span key={g.mal_id} style={{
+              padding: "2px 8px", borderRadius: "8px",
+              background: isDark ? "rgba(200,168,233,0.1)" : "rgba(233,30,140,0.08)",
+              color: isDark ? "#c8a8e9" : "#e91e8c",
+              fontSize: "10px", fontWeight: "600",
+            }}>{g.name}</span>
+          ))}
+        </div>
+        {showRating && ratings[anime.mal_id] && (
+          <div style={{ marginTop: 4 }}>
+            <span style={{
+              padding: "2px 10px", borderRadius: "10px",
+              background: `${RATING_TIERS.find(r => r.label === ratings[anime.mal_id])?.color}25`,
+              color: RATING_TIERS.find(r => r.label === ratings[anime.mal_id])?.color,
+              fontSize: "11px", fontWeight: "700",
+            }}>
+              {RATING_TIERS.find(r => r.label === ratings[anime.mal_id])?.emoji} {ratings[anime.mal_id]}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Click indicator */}
+      <div style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "16px", flexShrink: 0 }}>›</div>
+    </motion.div>
+  )
 
   return (
     <div style={{ padding: "clamp(16px, 4vw, 48px)", paddingTop: "clamp(80px, 10vw, 100px)" }}>
@@ -50,7 +123,7 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
           ✦ My Anime List
         </h1>
         <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "14px", margin: 0 }}>
-          {watchlist.length} anime saved · {ratedAnime.length} rated
+          {watchlist.length} anime saved · {ratedAnime.length} rated · click any to see details
         </p>
       </motion.div>
 
@@ -58,7 +131,7 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
       <div style={{
         display: "flex", gap: 8, marginBottom: "clamp(20px, 4vw, 32px)",
         borderBottom: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(233,30,140,0.15)",
-        paddingBottom: 0,
+        paddingBottom: 0, overflowX: "auto", scrollbarWidth: "none",
       }}>
         {[
           { id: "watchlist", label: "📋 Watchlist", count: unwatched.length },
@@ -73,8 +146,7 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
             style={{
               padding: "10px clamp(12px, 2vw, 20px)",
               borderRadius: "12px 12px 0 0",
-              border: "none",
-              cursor: "pointer",
+              border: "none", cursor: "pointer",
               fontSize: "clamp(12px, 1.5vw, 14px)",
               fontWeight: "600",
               background: activeTab === tab.id
@@ -87,6 +159,7 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
                 ? `2px solid ${isDark ? "#c8a8e9" : "#e91e8c"}`
                 : "2px solid transparent",
               transition: "all 0.3s",
+              whiteSpace: "nowrap",
             }}
           >
             {tab.label} {tab.count !== null && (
@@ -120,24 +193,15 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
                 </p>
               </div>
             ) : (
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(clamp(120px, 12vw, 160px), 1fr))",
-                gap: "clamp(10px, 2vw, 20px)",
-              }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {unwatched.map((anime, i) => (
                   <motion.div
                     key={anime.mal_id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.04 }}
                   >
-                    <AnimeCard
-                      anime={anime}
-                      onAdd={onAdd}
-                      onRate={onRate}
-                      isInWatchlist={true}
-                    />
+                    <AnimeListCard anime={anime} showRating={false} />
                   </motion.div>
                 ))}
               </div>
@@ -167,9 +231,7 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
                   fontSize: "13px", fontWeight: "600", cursor: "pointer",
                   border: isDark ? "1px solid rgba(200,168,233,0.2)" : "1px solid rgba(233,30,140,0.2)",
                 }}
-              >
-                All Rated
-              </motion.button>
+              >All Rated</motion.button>
               {RATING_TIERS.map(tier => (
                 <motion.button
                   key={tier.label}
@@ -192,45 +254,18 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
             {filteredRated.length === 0 ? (
               <div style={{ textAlign: "center", padding: "60px 0" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>⭐</div>
-                <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: 16 }}>
-                  No anime rated yet in this tier!
-                </p>
+                <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: 16 }}>No anime rated in this tier!</p>
               </div>
             ) : (
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(clamp(120px, 12vw, 160px), 1fr))",
-                gap: "clamp(10px, 2vw, 20px)",
-              }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {filteredRated.map((anime, i) => (
                   <motion.div
                     key={anime.mal_id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.04 }}
-                    style={{ position: "relative" }}
                   >
-                    {/* Rating badge */}
-                    <div style={{
-                      position: "absolute",
-                      top: -8, right: -4,
-                      zIndex: 10,
-                      padding: "3px 8px",
-                      borderRadius: "10px",
-                      background: RATING_TIERS.find(r => r.label === ratings[anime.mal_id])?.color || "#fff",
-                      fontSize: "10px",
-                      fontWeight: "700",
-                      color: "white",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
-                    }}>
-                      {RATING_TIERS.find(r => r.label === ratings[anime.mal_id])?.emoji} {ratings[anime.mal_id]}
-                    </div>
-                    <AnimeCard
-                      anime={anime}
-                      onAdd={onAdd}
-                      onRate={onRate}
-                      isInWatchlist={watchlist.some(w => w.mal_id === anime.mal_id)}
-                    />
+                    <AnimeListCard anime={anime} showRating={true} />
                   </motion.div>
                 ))}
               </div>
@@ -245,9 +280,8 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}
+            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 16 }}
           >
-            {/* Total saved */}
             {[
               { label: "Total Saved", value: watchlist.length, emoji: "📚", color: "#c8a8e9" },
               { label: "Total Rated", value: ratedAnime.length, emoji: "⭐", color: "#ffd700" },
@@ -263,27 +297,13 @@ export default function MyList({ user, watchlist, ratings, onAdd, onRate }) {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.08 }}
-                style={{
-                  ...cardStyle,
-                  padding: "clamp(16px, 3vw, 24px)",
-                  textAlign: "center",
-                }}
+                style={{ ...cardStyle, padding: "clamp(16px, 3vw, 24px)", textAlign: "center" }}
               >
                 <div style={{ fontSize: 36, marginBottom: 8 }}>{stat.emoji}</div>
-                <div style={{
-                  fontSize: "clamp(28px, 4vw, 40px)",
-                  fontWeight: "800",
-                  color: stat.color,
-                  fontFamily: "Georgia, serif",
-                }}>
+                <div style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: "800", color: stat.color, fontFamily: "Georgia, serif" }}>
                   {stat.value}
                 </div>
-                <div style={{
-                  color: isDark ? "#9b7fbf" : "#f06292",
-                  fontSize: "clamp(11px, 1.5vw, 13px)",
-                  fontWeight: "600",
-                  marginTop: 4,
-                }}>
+                <div style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "clamp(11px, 1.5vw, 13px)", fontWeight: "600", marginTop: 4 }}>
                   {stat.label}
                 </div>
               </motion.div>
