@@ -9,16 +9,18 @@ const fetchWithCache = async (url, retries = 3) => {
   if (cache[url]) return cache[url]
   for (let i = 0; i < retries; i++) {
     try {
-      await sleep(i * 600)
+      await sleep(i * 800)
       const res = await axios.get(url)
-      cache[url] = res
-      return res
+      if (res && res.data) {
+        cache[url] = res
+        return res
+      }
     } catch (err) {
       if (err.response?.status === 429) {
         await sleep(2000 * (i + 1))
         continue
       }
-      throw err
+      if (i === retries - 1) throw err
     }
   }
 }
@@ -45,8 +47,18 @@ export const searchAnime = (query, page = 1) =>
   axios.get(`${BASE}/anime?q=${query}&limit=25&page=${page}`)
 
 export const getByGenre = async (genreId, page = 1) => {
-  await sleep(300)
-  return fetchWithCache(`${BASE}/anime?genres=${genreId}&order_by=score&sort=desc&limit=25&page=${page}`)
+  const url = `${BASE}/anime?genres=${genreId}&order_by=score&sort=desc&limit=25&page=${page}`
+  await sleep(400)
+  try {
+    const res = await axios.get(url)
+    return res
+  } catch (err) {
+    if (err.response?.status === 429) {
+      await sleep(2500)
+      return axios.get(url)
+    }
+    throw err
+  }
 }
 
 export const GENRES = {
