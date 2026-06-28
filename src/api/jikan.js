@@ -100,7 +100,7 @@ export const MOOD_GENRES = {
   excited: [1, 2],
   romantic: [22, 8],
   scared: [14, 37],
-  cozy: [36, 4],
+  cozy: [36, 5],
   epic: [10, 24],
   nostalgic: [13, 23],
   curious: [7, 40],
