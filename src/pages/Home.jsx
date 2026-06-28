@@ -20,19 +20,26 @@ export default function Home({ user, onLogout }) {
   const isDark = theme === "dark"
   const [selectedMood, setSelectedMood] = useState(null)
   const [moodAnime, setMoodAnime] = useState([])
+  const [moodPage, setMoodPage] = useState(1)
+  const [hasMoreMood, setHasMoreMood] = useState(true)
   const [moodLoading, setMoodLoading] = useState(false)
+  const [moodLoadingMore, setMoodLoadingMore] = useState(false)
   const [searchResults, setSearchResults] = useState(null)
   const [showMyList, setShowMyList] = useState(false)
   const [showBrowse, setShowBrowse] = useState(false)
   const [selectedAnime, setSelectedAnime] = useState(null)
+
   const [watchlist, setWatchlist] = useState(() => {
-    return JSON.parse(localStorage.getItem(`animood_watchlist_${user?.email}`) || "[]")
+    try { return JSON.parse(localStorage.getItem(`animood_watchlist_${user?.email}`) || "[]") }
+    catch { return [] }
   })
   const [ratings, setRatings] = useState(() => {
-    return JSON.parse(localStorage.getItem(`animood_ratings_${user?.email}`) || "{}")
+    try { return JSON.parse(localStorage.getItem(`animood_ratings_${user?.email}`) || "{}") }
+    catch { return {} }
   })
   const [notes, setNotes] = useState(() => {
-    return JSON.parse(localStorage.getItem(`animood_notes_${user?.email}`) || "{}")
+    try { return JSON.parse(localStorage.getItem(`animood_notes_${user?.email}`) || "{}") }
+    catch { return {} }
   })
   const [toast, setToast] = useState(null)
 
@@ -41,28 +48,69 @@ export default function Home({ user, onLogout }) {
     setTimeout(() => setToast(null), 3000)
   }
 
+  const saveWatchlist = (updated) => {
+    setWatchlist(updated)
+    try { localStorage.setItem(`animood_watchlist_${user?.email}`, JSON.stringify(updated)) }
+    catch (e) { console.error("Failed to save watchlist", e) }
+  }
+
+  const saveRatings = (updated) => {
+    setRatings(updated)
+    try { localStorage.setItem(`animood_ratings_${user?.email}`, JSON.stringify(updated)) }
+    catch (e) { console.error("Failed to save ratings", e) }
+  }
+
+  const saveNotes = (updated) => {
+    setNotes(updated)
+    try { localStorage.setItem(`animood_notes_${user?.email}`, JSON.stringify(updated)) }
+    catch (e) { console.error("Failed to save notes", e) }
+  }
+
   const resetAll = () => {
     setShowMyList(false)
     setShowBrowse(false)
     setSearchResults(null)
     setSelectedMood(null)
+    setMoodAnime([])
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const handleMoodSelect = async (mood) => {
     setSelectedMood(mood)
+    setMoodAnime([])
+    setMoodPage(1)
+    setHasMoreMood(true)
     setSearchResults(null)
     setShowMyList(false)
     setShowBrowse(false)
     setMoodLoading(true)
     try {
       const genreIds = MOOD_GENRES[mood.id]
-      const res = await getByGenre(genreIds[0])
+      const res = await getByGenre(genreIds[0], 1)
       setMoodAnime(res.data.data || [])
+      setHasMoreMood(res.data.pagination?.has_next_page || false)
+      setMoodPage(1)
     } catch (err) {
       console.error(err)
     } finally {
       setMoodLoading(false)
+    }
+  }
+
+  const loadMoreMood = async () => {
+    if (!selectedMood || moodLoadingMore) return
+    setMoodLoadingMore(true)
+    try {
+      const genreIds = MOOD_GENRES[selectedMood.id]
+      const nextPage = moodPage + 1
+      const res = await getByGenre(genreIds[0], nextPage)
+      setMoodAnime(prev => [...prev, ...(res.data.data || [])])
+      setHasMoreMood(res.data.pagination?.has_next_page || false)
+      setMoodPage(nextPage)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setMoodLoadingMore(false)
     }
   }
 
@@ -76,27 +124,25 @@ export default function Home({ user, onLogout }) {
       updated = [...watchlist, anime]
       showToast(`Added "${anime.title_english || anime.title}" to watchlist ✦`)
     }
-    setWatchlist(updated)
-    localStorage.setItem(`animood_watchlist_${user?.email}`, JSON.stringify(updated))
+    saveWatchlist(updated)
   }
 
   const handleRate = (anime, rating) => {
     const updated = { ...ratings, [anime.mal_id]: rating }
-    setRatings(updated)
-    localStorage.setItem(`animood_ratings_${user?.email}`, JSON.stringify(updated))
+    saveRatings(updated)
     showToast(`Rated "${anime.title_english || anime.title}" as ${rating}! ✦`)
   }
 
   const handleNote = (anime, note) => {
     const updated = { ...notes, [anime.mal_id]: note }
-    setNotes(updated)
-    localStorage.setItem(`animood_notes_${user?.email}`, JSON.stringify(updated))
+    saveNotes(updated)
     showToast(`Note saved! 📝`)
   }
 
   const handleSearch = (results) => {
     setSearchResults(results)
     setSelectedMood(null)
+    setMoodAnime([])
     setShowMyList(false)
     setShowBrowse(false)
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -118,14 +164,10 @@ export default function Home({ user, onLogout }) {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const handleCardClick = (anime) => {
-    setSelectedAnime(anime)
-  }
+  const handleCardClick = (anime) => setSelectedAnime(anime)
 
   const fullPageStyle = {
-    position: "fixed",
-    inset: 0,
-    zIndex: 50,
+    position: "fixed", inset: 0, zIndex: 50,
     overflowY: "auto",
     background: isDark ? "#020818" : "#fff0f5",
   }
@@ -134,8 +176,7 @@ export default function Home({ user, onLogout }) {
     position: "fixed",
     top: "clamp(70px, 10vw, 90px)",
     right: "clamp(12px, 3vw, 32px)",
-    zIndex: 200,
-    width: 40, height: 40,
+    zIndex: 200, width: 40, height: 40,
     borderRadius: "50%",
     border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)",
     background: isDark ? "rgba(10,5,40,0.95)" : "rgba(255,240,245,0.95)",
@@ -149,21 +190,15 @@ export default function Home({ user, onLogout }) {
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
 
-      {/* Video backgrounds — only show on main home */}
+      {/* Video backgrounds — only on hero */}
       {!showMyList && !showBrowse && !searchResults && !selectedMood && (
-  isDark ? <DarkCharacter /> : <LightCharacter />
-)}
+        isDark ? <DarkCharacter /> : <LightCharacter />
+      )}
 
-      {/* MY LIST — full page */}
+      {/* MY LIST */}
       <AnimatePresence>
         {showMyList && (
-          <motion.div
-            key="mylist"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={fullPageStyle}
-          >
+          <motion.div key="mylist" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={fullPageStyle}>
             <Navbar user={user} onLogout={onLogout} onSearch={handleSearch} onMyList={handleMyList} onBrowse={handleBrowse} onHome={resetAll} />
             <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setShowMyList(false)} style={closeBtnStyle}>✕</motion.button>
             <MyList user={user} watchlist={watchlist} ratings={ratings} onAdd={handleAdd} onRate={handleRate} onCardClick={handleCardClick} />
@@ -171,16 +206,10 @@ export default function Home({ user, onLogout }) {
         )}
       </AnimatePresence>
 
-      {/* BROWSE — full page */}
+      {/* BROWSE */}
       <AnimatePresence>
         {showBrowse && (
-          <motion.div
-            key="browse"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={fullPageStyle}
-          >
+          <motion.div key="browse" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={fullPageStyle}>
             <Navbar user={user} onLogout={onLogout} onSearch={handleSearch} onMyList={handleMyList} onBrowse={handleBrowse} onHome={resetAll} />
             <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setShowBrowse(false)} style={closeBtnStyle}>✕</motion.button>
             <Browse watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
@@ -198,26 +227,14 @@ export default function Home({ user, onLogout }) {
             {/* Search results */}
             <AnimatePresence>
               {searchResults && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  style={{
-                    padding: "clamp(16px, 4vw, 48px)",
-                    background: isDark ? "rgba(2,8,24,0.92)" : "rgba(255,240,245,0.92)",
-                    backdropFilter: "blur(20px)",
-                    minHeight: "100vh",
-                  }}
-                >
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  style={{ padding: "clamp(16px, 4vw, 48px)", background: isDark ? "#020818" : "#fff0f5", minHeight: "100vh" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: 0 }}>
-                      🔍 Search Results
-                    </h2>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      onClick={() => setSearchResults(null)}
-                      style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)", background: "transparent", color: isDark ? "#c8a8e9" : "#e91e8c", cursor: "pointer", fontSize: "13px" }}
-                    >Clear ✕</motion.button>
+                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: 0 }}>🔍 Search Results</h2>
+                    <motion.button whileHover={{ scale: 1.05 }} onClick={() => setSearchResults(null)}
+                      style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)", background: "transparent", color: isDark ? "#c8a8e9" : "#e91e8c", cursor: "pointer", fontSize: "13px" }}>
+                      Clear ✕
+                    </motion.button>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(clamp(120px, 12vw, 160px), 1fr))", gap: "clamp(10px, 2vw, 20px)" }}>
                     {searchResults.map(anime => (
@@ -230,66 +247,35 @@ export default function Home({ user, onLogout }) {
               )}
             </AnimatePresence>
 
-            {/* Hero section */}
+            {/* Hero */}
             {!searchResults && !selectedMood && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                style={{
-                  padding: "clamp(40px, 8vw, 100px) clamp(16px, 6vw, 80px)",
-                  minHeight: "70vh",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+                style={{ padding: "clamp(40px, 8vw, 100px) clamp(16px, 6vw, 80px)", minHeight: "70vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
                   style={{ color: isDark ? "#c8a8e9" : "#ffb7c5", fontSize: "clamp(10px, 1.3vw, 13px)", fontWeight: "700", letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 12px 0" }}>
                   ✦ Your Anime Universe
                 </motion.p>
-
-                <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                <motion.h1 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
                   style={{ fontFamily: "Georgia, serif", fontSize: "clamp(28px, 6vw, 72px)", fontWeight: "bold", color: "white", margin: "0 0 16px 0", lineHeight: 1.1, textShadow: "0 4px 20px rgba(0,0,0,0.5)", maxWidth: "700px" }}>
                   Discover Anime<br />
                   <span style={{ color: isDark ? "#c8a8e9" : "#ffb7c5" }}>By Your Mood</span>
                 </motion.h1>
-
-                <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
                   style={{ color: "rgba(255,255,255,0.8)", fontSize: "clamp(13px, 2vw, 17px)", margin: "0 0 32px 0", maxWidth: "500px", lineHeight: 1.6 }}>
                   Tell us how you feel and we'll find your perfect anime. Track, rate, and build your personal anime universe.
                 </motion.p>
-
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                  style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                   <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.97 }}
                     onClick={() => window.scrollTo({ top: window.innerHeight * 0.9, behavior: "smooth" })}
-                    style={{
-                      padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "16px",
-                      background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #e91e8c, #f48fb1)",
-                      color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer",
-                      fontFamily: "Georgia, serif",
-                      boxShadow: isDark ? "0 8px 30px rgba(200,168,233,0.4)" : "0 8px 30px rgba(233,30,140,0.4)",
-                      display: "flex", alignItems: "center", gap: 10,
-                    }}>
+                    style={{ padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "16px", background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #e91e8c, #f48fb1)", color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer", fontFamily: "Georgia, serif", boxShadow: isDark ? "0 8px 30px rgba(200,168,233,0.4)" : "0 8px 30px rgba(233,30,140,0.4)", display: "flex", alignItems: "center", gap: 10 }}>
                     ✦ Start Exploring Free →
                   </motion.div>
-
-                  <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.97 }}
-                    onClick={handleBrowse}
-                    style={{
-                      padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "16px",
-                      background: "rgba(255,255,255,0.12)", border: "2px solid rgba(255,255,255,0.3)",
-                      color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer",
-                      fontFamily: "Georgia, serif", backdropFilter: "blur(10px)",
-                      display: "flex", alignItems: "center", gap: 10,
-                    }}>
+                  <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.97 }} onClick={handleBrowse}
+                    style={{ padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "16px", background: "rgba(255,255,255,0.12)", border: "2px solid rgba(255,255,255,0.3)", color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer", fontFamily: "Georgia, serif", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", gap: 10 }}>
                     🎭 Browse All Anime
                   </motion.div>
                 </motion.div>
-
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-                  style={{ display: "flex", gap: "clamp(20px, 4vw, 40px)", marginTop: 40, flexWrap: "wrap" }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} style={{ display: "flex", gap: "clamp(20px, 4vw, 40px)", marginTop: 40, flexWrap: "wrap" }}>
                   {[{ num: "1000+", label: "Anime" }, { num: "12", label: "Moods" }, { num: "Free", label: "Forever" }].map((stat, i) => (
                     <div key={i}>
                       <div style={{ fontFamily: "Georgia, serif", fontSize: "clamp(20px, 3vw, 28px)", fontWeight: "bold", color: isDark ? "#c8a8e9" : "#ffb7c5" }}>{stat.num}</div>
@@ -302,7 +288,7 @@ export default function Home({ user, onLogout }) {
 
             {/* Mood picker */}
             {!searchResults && (
-              <div style={{ background: isDark ? "rgba(2,8,24,0.75)" : "rgba(255,240,245,0.75)", backdropFilter: "blur(16px)", padding: "clamp(20px, 4vw, 40px) 0" }}>
+              <div style={{ background: isDark ? "rgba(2,8,24,0.85)" : "rgba(255,240,245,0.85)", backdropFilter: "blur(16px)", padding: "clamp(20px, 4vw, 40px) 0" }}>
                 <MoodPicker onMoodSelect={handleMoodSelect} selectedMood={selectedMood} />
               </div>
             )}
@@ -311,31 +297,55 @@ export default function Home({ user, onLogout }) {
             <AnimatePresence>
               {selectedMood && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  style={{ padding: "0 clamp(16px, 4vw, 48px)", marginBottom: 40, background: isDark ? "rgba(2,8,24,0.85)" : "rgba(255,240,245,0.85)", backdropFilter: "blur(16px)" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 20, marginBottom: 20 }}>
+                  style={{ padding: "0 clamp(16px, 4vw, 48px)", marginBottom: 40, background: isDark ? "#020818" : "#fff0f5", minHeight: "60vh" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 24, marginBottom: 20 }}>
                     <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: 0 }}>
-                      {selectedMood.emoji} {selectedMood.label} Picks
+                      {selectedMood.emoji} {selectedMood.label} Picks — {moodAnime.length} anime
                     </h2>
-                    <motion.button whileHover={{ scale: 1.05 }} onClick={() => setSelectedMood(null)}
+                    <motion.button whileHover={{ scale: 1.05 }} onClick={() => { setSelectedMood(null); setMoodAnime([]) }}
                       style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)", background: "transparent", color: isDark ? "#c8a8e9" : "#e91e8c", cursor: "pointer", fontSize: "13px" }}>
                       Clear ✕
                     </motion.button>
                   </div>
+
                   {moodLoading ? (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(clamp(120px, 12vw, 160px), 1fr))", gap: 16 }}>
-                      {Array.from({ length: 10 }).map((_, i) => (
+                      {Array.from({ length: 25 }).map((_, i) => (
                         <motion.div key={i} style={{ aspectRatio: "2/3", borderRadius: "12px", background: isDark ? "rgba(200,168,233,0.1)" : "rgba(233,30,140,0.08)" }}
-                          animate={{ opacity: [0.4, 0.8, 0.4] }} transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }} />
+                          animate={{ opacity: [0.4, 0.8, 0.4] }} transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.05 }} />
                       ))}
                     </div>
                   ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(clamp(120px, 12vw, 160px), 1fr))", gap: "clamp(10px, 2vw, 20px)", paddingBottom: 20 }}>
-                      {moodAnime.map((anime, i) => (
-                        <motion.div key={anime.mal_id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} onClick={() => handleCardClick(anime)}>
-                          <AnimeCard anime={anime} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} isInWatchlist={watchlist.some(w => w.mal_id === anime.mal_id)} userNote={notes[anime.mal_id]} />
-                        </motion.div>
-                      ))}
-                    </div>
+                    <>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(clamp(120px, 12vw, 160px), 1fr))", gap: "clamp(10px, 2vw, 20px)", paddingBottom: 20 }}>
+                        {moodAnime.map((anime, i) => (
+                          <motion.div key={`${anime.mal_id}-${i}`} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: Math.min(i * 0.03, 0.4) }} onClick={() => handleCardClick(anime)}>
+                            <AnimeCard anime={anime} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} isInWatchlist={watchlist.some(w => w.mal_id === anime.mal_id)} userNote={notes[anime.mal_id]} />
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      {/* Load More Mood */}
+                      {hasMoreMood && (
+                        <div style={{ textAlign: "center", paddingBottom: 40 }}>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                            onClick={loadMoreMood}
+                            style={{
+                              padding: "14px 40px", borderRadius: "24px", border: "none",
+                              background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #e91e8c, #f48fb1)",
+                              color: "white", fontSize: "15px", fontWeight: "700", cursor: "pointer",
+                              boxShadow: isDark ? "0 4px 20px rgba(200,168,233,0.3)" : "0 4px 20px rgba(233,30,140,0.3)",
+                            }}
+                          >
+                            {moodLoadingMore ? "Loading..." : `Load More ${selectedMood.emoji} (+25)`}
+                          </motion.button>
+                          <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "12px", marginTop: 8 }}>
+                            Showing {moodAnime.length} anime
+                          </p>
+                        </div>
+                      )}
+                    </>
                   )}
                 </motion.div>
               )}
@@ -343,7 +353,7 @@ export default function Home({ user, onLogout }) {
 
             {/* Netflix rows */}
             {!searchResults && (
-              <div style={{ background: isDark ? "rgba(2,8,24,0.88)" : "rgba(255,240,245,0.88)", backdropFilter: "blur(20px)", borderRadius: "24px 24px 0 0", paddingTop: "clamp(20px, 4vw, 40px)" }}>
+              <div style={{ background: isDark ? "rgba(2,8,24,0.92)" : "rgba(255,240,245,0.92)", backdropFilter: "blur(20px)", borderRadius: "24px 24px 0 0", paddingTop: "clamp(20px, 4vw, 40px)" }}>
                 <AnimeRow title="Trending Now" emoji="🔥" fetchFn={getTrending} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
                 <AnimeRow title="Top Rated" emoji="👑" fetchFn={getTopRated} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
                 <AnimeRow title="New Releases" emoji="🌟" fetchFn={getNewReleases} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
@@ -374,19 +384,10 @@ export default function Home({ user, onLogout }) {
       {/* Toast */}
       <AnimatePresence>
         {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            style={{
-              position: "fixed", bottom: "clamp(16px, 3vw, 32px)", left: "50%", transform: "translateX(-50%)",
-              zIndex: 300, padding: "12px 24px", borderRadius: "20px",
-              background: isDark ? "rgba(10,5,40,0.95)" : "rgba(255,240,245,0.95)",
-              border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)",
-              color: isDark ? "#e8d5f5" : "#e91e8c", fontSize: "14px", fontWeight: "600",
-              backdropFilter: "blur(20px)", boxShadow: "0 8px 30px rgba(0,0,0,0.2)", whiteSpace: "nowrap",
-            }}
-          >{toast}</motion.div>
+          <motion.div initial={{ opacity: 0, y: 50, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            style={{ position: "fixed", bottom: "clamp(16px, 3vw, 32px)", left: "50%", transform: "translateX(-50%)", zIndex: 300, padding: "12px 24px", borderRadius: "20px", background: isDark ? "rgba(10,5,40,0.95)" : "rgba(255,240,245,0.95)", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)", color: isDark ? "#e8d5f5" : "#e91e8c", fontSize: "14px", fontWeight: "600", backdropFilter: "blur(20px)", boxShadow: "0 8px 30px rgba(0,0,0,0.2)", whiteSpace: "nowrap" }}>
+            {toast}
+          </motion.div>
         )}
       </AnimatePresence>
 
