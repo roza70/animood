@@ -2,7 +2,7 @@
 
 A Netflix-style anime discovery app that recommends anime based on your mood. Built as a full-stack portfolio project.
 
-![AniMood Banner](./screenshots/hero-dark.png)
+![AniMood Banner](./scre
 
 ## Features
 
@@ -71,7 +71,7 @@ src/
 
 ## Author
 
-Built by Tahsin Akter Roza — final-year Software Engineering student at IUBAT.
+Built by Tahsin Akter Roza 
 
 ## License
 
