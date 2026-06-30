@@ -41,6 +41,10 @@ export default function Home({ user, onLogout }) {
     try { return JSON.parse(localStorage.getItem(`animood_notes_${user?.email}`) || "{}") }
     catch { return {} }
   })
+  const [statuses, setStatuses] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(`animood_statuses_${user?.email}`) || "{}") }
+    catch { return {} }
+  })
   const [toast, setToast] = useState(null)
 
   const showToast = (msg) => {
@@ -64,6 +68,12 @@ export default function Home({ user, onLogout }) {
     setNotes(updated)
     try { localStorage.setItem(`animood_notes_${user?.email}`, JSON.stringify(updated)) }
     catch (e) { console.error("Failed to save notes", e) }
+  }
+
+  const saveStatuses = (updated) => {
+    setStatuses(updated)
+    try { localStorage.setItem(`animood_statuses_${user?.email}`, JSON.stringify(updated)) }
+    catch (e) { console.error("Failed to save statuses", e) }
   }
 
   const resetAll = () => {
@@ -139,6 +149,19 @@ export default function Home({ user, onLogout }) {
     showToast(`Note saved! 📝`)
   }
 
+  const handleStatus = (anime, status) => {
+    const updated = { ...statuses, [anime.mal_id]: status }
+    saveStatuses(updated)
+    const labels = {
+      watching: "Watching",
+      completed: "Completed",
+      onhold: "On Hold",
+      dropped: "Dropped",
+      plantowatch: "Plan to Watch",
+    }
+    showToast(`Marked as ${labels[status] || status}! ✦`)
+  }
+
   const handleSearch = (results) => {
     setSearchResults(results)
     setSelectedMood(null)
@@ -201,7 +224,16 @@ export default function Home({ user, onLogout }) {
           <motion.div key="mylist" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={fullPageStyle}>
             <Navbar user={user} onLogout={onLogout} onSearch={handleSearch} onMyList={handleMyList} onBrowse={handleBrowse} onHome={resetAll} />
             <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setShowMyList(false)} style={closeBtnStyle}>✕</motion.button>
-            <MyList user={user} watchlist={watchlist} ratings={ratings} onAdd={handleAdd} onRate={handleRate} onCardClick={handleCardClick} />
+            <MyList
+              user={user}
+              watchlist={watchlist}
+              ratings={ratings}
+              statuses={statuses}
+              onAdd={handleAdd}
+              onRate={handleRate}
+              onStatus={handleStatus}
+              onCardClick={handleCardClick}
+            />
           </motion.div>
         )}
       </AnimatePresence>
