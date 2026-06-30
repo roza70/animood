@@ -121,7 +121,7 @@ export default function LightCharacter() {
         )}
       </AnimatePresence>
 
-      <div className="absolute z-20" style={{ top: "8%", left: "5%" }}>
+      <div className="absolute z-20" style={{ top: "20%", right: "64%" }}>
         <AnimatePresence mode="wait">
           {showQuote && (
             <motion.div

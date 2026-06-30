@@ -61,7 +61,7 @@ export default function DarkCharacter() {
         style={{ background: "linear-gradient(to top, rgba(2,8,24,0.6) 0%, rgba(2,8,24,0.05) 50%, rgba(2,8,24,0.2) 100%)" }}
       />
 
-      <div className="absolute z-20" style={{ top: "8%", left: "32%" }}>
+      <div className="absolute z-20" style={{ top: "10%", right: "10%" }}>
         <AnimatePresence mode="wait">
           {showQuote && (
             <motion.div

@@ -188,7 +188,7 @@ export default function Home({ user, onLogout }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative" }}>
+    <div style={{ minHeight: "100vh", position: "relative", background: isDark ? "#020818" : "#fff0f5" }}>
 
       {/* Video backgrounds — only on hero */}
       {!showMyList && !showBrowse && !searchResults && !selectedMood && (
@@ -288,7 +288,7 @@ export default function Home({ user, onLogout }) {
 
             {/* Mood picker */}
             {!searchResults && (
-              <div style={{ background: isDark ? "rgba(2,8,24,0.85)" : "rgba(255,240,245,0.85)", backdropFilter: "blur(16px)", padding: "clamp(20px, 4vw, 40px) 0" }}>
+              <div style={{ background: isDark ? "#020818" : "#fff0f5", padding: "clamp(20px, 4vw, 40px) 0" }}>
                 <MoodPicker onMoodSelect={handleMoodSelect} selectedMood={selectedMood} />
               </div>
             )}
@@ -297,7 +297,7 @@ export default function Home({ user, onLogout }) {
             <AnimatePresence>
               {selectedMood && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  style={{ padding: "0 clamp(16px, 4vw, 48px)", marginBottom: 40, background: isDark ? "#020818" : "#fff0f5", minHeight: "60vh" }}>
+                  style={{ padding: "0 clamp(16px, 4vw, 48px)", background: isDark ? "#020818" : "#fff0f5", minHeight: "60vh" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 24, marginBottom: 20 }}>
                     <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: 0 }}>
                       {selectedMood.emoji} {selectedMood.label} Picks — {moodAnime.length} anime
@@ -325,7 +325,6 @@ export default function Home({ user, onLogout }) {
                         ))}
                       </div>
 
-                      {/* Load More Mood */}
                       {hasMoreMood && (
                         <div style={{ textAlign: "center", paddingBottom: 40 }}>
                           <motion.button
@@ -353,7 +352,7 @@ export default function Home({ user, onLogout }) {
 
             {/* Netflix rows */}
             {!searchResults && (
-              <div style={{ background: isDark ? "rgba(2,8,24,0.92)" : "rgba(255,240,245,0.92)", backdropFilter: "blur(20px)", borderRadius: "24px 24px 0 0", paddingTop: "clamp(20px, 4vw, 40px)" }}>
+              <div style={{ background: isDark ? "#020818" : "#fff0f5", paddingTop: "clamp(20px, 4vw, 40px)" }}>
                 <AnimeRow title="Trending Now" emoji="🔥" fetchFn={getTrending} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
                 <AnimeRow title="Top Rated" emoji="👑" fetchFn={getTopRated} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
                 <AnimeRow title="New Releases" emoji="🌟" fetchFn={getNewReleases} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
