@@ -47,8 +47,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
   const AnimeListCard = ({ anime, showRating }) => {
     const st = statusBadge(getStatus(anime.mal_id))
     return (
-      <motion.div
-        whileHover={{ scale: 1.02, y: -2 }}
+      <div
         style={{
           display: "flex", gap: 14, alignItems: "center",
           padding: "12px 16px", borderRadius: "14px",
@@ -91,8 +90,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
 
         {/* Status dropdown */}
         <div style={{ position: "relative", flexShrink: 0 }}>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
+          <button
             onClick={(e) => { e.stopPropagation(); setStatusMenuFor(statusMenuFor === anime.mal_id ? null : anime.mal_id) }}
             style={{
               padding: "6px 12px", borderRadius: "12px", border: "none",
@@ -102,7 +100,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
             }}
           >
             {st.emoji} {st.label}
-          </motion.button>
+          </button>
           <AnimatePresence>
             {statusMenuFor === anime.mal_id && (
               <motion.div
@@ -116,9 +114,8 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                 }}
               >
                 {STATUSES.map(s => (
-                  <motion.button
+                  <button
                     key={s.key}
-                    whileHover={{ x: 4 }}
                     onClick={() => { onStatus && onStatus(anime, s.key); setStatusMenuFor(null) }}
                     style={{
                       display: "flex", alignItems: "center", gap: 8,
@@ -126,13 +123,13 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                       background: "transparent", color: s.color,
                       fontSize: "13px", fontWeight: "600", cursor: "pointer", textAlign: "left",
                     }}
-                  >{s.emoji} {s.label}</motion.button>
+                  >{s.emoji} {s.label}</button>
                 ))}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-      </motion.div>
+      </div>
     )
   }
 
@@ -151,14 +148,14 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
   return (
     <div style={{ padding: "clamp(16px, 4vw, 48px)", paddingTop: "clamp(80px, 10vw, 100px)" }}>
 
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: "clamp(20px, 4vw, 36px)" }}>
+      <div style={{ marginBottom: "clamp(20px, 4vw, 36px)" }}>
         <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(22px, 4vw, 36px)", fontWeight: "bold", color: isDark ? "#e8d5f5" : "#e91e8c", margin: "0 0 8px 0" }}>
           ✦ My Anime List
         </h1>
         <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "14px", margin: 0 }}>
           {watchlist.length} total · {ratedAnime.length} rated · click status badge to change
         </p>
-      </motion.div>
+      </div>
 
       {/* Tabs */}
       <div style={{
@@ -171,10 +168,9 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
           { id: "ratings", label: "⭐ Ratings", count: ratedAnime.length },
           { id: "stats", label: "📊 Stats", count: null },
         ].map(tab => (
-          <motion.button
+          <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             style={{
               padding: "10px clamp(10px, 2vw, 18px)",
               borderRadius: "12px 12px 0 0",
@@ -183,7 +179,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
               background: activeTab === tab.id ? isDark ? "rgba(200,168,233,0.2)" : "rgba(233,30,140,0.1)" : "transparent",
               color: activeTab === tab.id ? isDark ? "#e8d5f5" : "#e91e8c" : isDark ? "#9b7fbf" : "#f06292",
               borderBottom: activeTab === tab.id ? `2px solid ${isDark ? "#c8a8e9" : "#e91e8c"}` : "2px solid transparent",
-              transition: "all 0.3s", whiteSpace: "nowrap",
+              transition: "background 0.2s", whiteSpace: "nowrap",
             }}
           >
             {tab.label} {tab.count !== null && (
@@ -191,14 +187,14 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                 {tab.count}
               </span>
             )}
-          </motion.button>
+          </button>
         ))}
       </div>
 
       <AnimatePresence mode="wait">
         {/* Status tabs */}
         {STATUSES.map(s => activeTab === s.key && (
-          <motion.div key={s.key} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+          <motion.div key={s.key} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             {byStatus(s.key).length === 0 ? (
               <div style={{ textAlign: "center", padding: "60px 0" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>{s.emoji}</div>
@@ -206,10 +202,8 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {byStatus(s.key).map((anime, i) => (
-                  <motion.div key={anime.mal_id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}>
-                    <AnimeListCard anime={anime} showRating={true} />
-                  </motion.div>
+                {byStatus(s.key).map((anime) => (
+                  <AnimeListCard key={anime.mal_id} anime={anime} showRating={true} />
                 ))}
               </div>
             )}
@@ -218,10 +212,9 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
 
         {/* Ratings tab */}
         {activeTab === "ratings" && (
-          <motion.div key="ratings" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+          <motion.div key="ratings" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
-              <motion.button
-                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+              <button
                 onClick={() => setActiveTier("all")}
                 style={{
                   padding: "8px 16px", borderRadius: "20px",
@@ -230,19 +223,17 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                   fontSize: "13px", fontWeight: "600", cursor: "pointer",
                   border: isDark ? "1px solid rgba(200,168,233,0.2)" : "1px solid rgba(233,30,140,0.2)",
                 }}
-              >All Rated</motion.button>
+              >All Rated</button>
               {RATING_TIERS.map(tier => (
-                <motion.button
+                <button
                   key={tier.label}
-                  whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveTier(tier.label)}
                   style={{
                     padding: "8px 16px", borderRadius: "20px", border: `1px solid ${tier.color}40`,
                     background: activeTier === tier.label ? `${tier.color}25` : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.5)",
                     color: tier.color, fontSize: "13px", fontWeight: "600", cursor: "pointer",
-                    boxShadow: activeTier === tier.label ? `0 0 12px ${tier.color}30` : "none",
                   }}
-                >{tier.emoji} {tier.label}</motion.button>
+                >{tier.emoji} {tier.label}</button>
               ))}
             </div>
 
@@ -253,10 +244,8 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {filteredRated.map((anime, i) => (
-                  <motion.div key={anime.mal_id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}>
-                    <AnimeListCard anime={anime} showRating={true} />
-                  </motion.div>
+                {filteredRated.map((anime) => (
+                  <AnimeListCard key={anime.mal_id} anime={anime} showRating={true} />
                 ))}
               </div>
             )}
@@ -265,7 +254,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
 
         {/* Stats tab with charts */}
         {activeTab === "stats" && (
-          <motion.div key="stats" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+          <motion.div key="stats" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
 
             {/* Summary cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 14, marginBottom: 32 }}>
@@ -273,13 +262,12 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                 { label: "Total Anime", value: watchlist.length, emoji: "📚", color: isDark ? "#c8a8e9" : "#e91e8c" },
                 { label: "Total Rated", value: ratedAnime.length, emoji: "⭐", color: "#ffd700" },
                 ...STATUSES.map(s => ({ label: s.label, value: byStatus(s.key).length, emoji: s.emoji, color: s.color })),
-              ].map((stat, i) => (
-                <motion.div key={stat.label} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
-                  style={{ ...cardStyle, padding: "clamp(14px, 2.5vw, 20px)", textAlign: "center" }}>
+              ].map((stat) => (
+                <div key={stat.label} style={{ ...cardStyle, padding: "clamp(14px, 2.5vw, 20px)", textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 6 }}>{stat.emoji}</div>
                   <div style={{ fontSize: "clamp(22px, 3vw, 30px)", fontWeight: "800", color: stat.color, fontFamily: "Georgia, serif" }}>{stat.value}</div>
                   <div style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "clamp(10px, 1.3vw, 12px)", fontWeight: "600", marginTop: 4 }}>{stat.label}</div>
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -287,8 +275,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
 
               {/* Pie chart - status breakdown */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                style={{ ...cardStyle, padding: "clamp(16px, 3vw, 24px)" }}>
+              <div style={{ ...cardStyle, padding: "clamp(16px, 3vw, 24px)" }}>
                 <h3 style={{ fontFamily: "Georgia, serif", color: isDark ? "#e8d5f5" : "#c2185b", fontSize: "clamp(14px, 2vw, 18px)", margin: "0 0 16px 0" }}>
                   📊 Status Breakdown
                 </h3>
@@ -306,11 +293,10 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                     </PieChart>
                   </ResponsiveContainer>
                 )}
-              </motion.div>
+              </div>
 
               {/* Bar chart - ratings */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                style={{ ...cardStyle, padding: "clamp(16px, 3vw, 24px)" }}>
+              <div style={{ ...cardStyle, padding: "clamp(16px, 3vw, 24px)" }}>
                 <h3 style={{ fontFamily: "Georgia, serif", color: isDark ? "#e8d5f5" : "#c2185b", fontSize: "clamp(14px, 2vw, 18px)", margin: "0 0 16px 0" }}>
                   ⭐ Rating Distribution
                 </h3>
@@ -330,7 +316,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                     </BarChart>
                   </ResponsiveContainer>
                 )}
-              </motion.div>
+              </div>
             </div>
           </motion.div>
         )}
