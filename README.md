@@ -2,7 +2,7 @@
 
 A Netflix-style anime discovery app that recommends anime based on your mood. Built as a full-stack portfolio project.
 
-![AniMood Banner](./scre
+![AniMood Banner]
 
 ## Features
 
