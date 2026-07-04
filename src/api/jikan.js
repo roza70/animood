@@ -43,8 +43,11 @@ export const getAnimeCharacters = (id) =>
 export const getAnimeEpisodes = (id, page = 1) =>
   fetchWithCache(`${BASE}/anime/${id}/episodes?page=${page}`)
 
+export const getAnimeRelations = (id) =>
+  fetchWithCache(`${BASE}/anime/${id}/relations`)
+
 export const searchAnime = (query, page = 1) =>
-  axios.get(`${BASE}/anime?q=${query}&limit=25&page=${page}`)
+  axios.get(`${BASE}/anime?q=${encodeURIComponent(query)}&limit=25&page=${page}`)
 
 export const getByGenre = async (genreId, page = 1) => {
   const url = `${BASE}/anime?genres=${genreId}&order_by=score&sort=desc&limit=25&page=${page}`
@@ -76,7 +79,7 @@ export const GENRES = {
   supernatural: 37,
   thriller: 41,
   isekai: 62,
-  magic: 16,
+  magic: 16,       // Magic/Mahou — genre 16 is correct
   mecha: 18,
   music: 19,
   psychological: 40,
@@ -100,7 +103,7 @@ export const MOOD_GENRES = {
   excited: [1, 2],
   romantic: [22, 8],
   scared: [14, 37],
-  cozy: [36, 5],
+  cozy: [36, 4],
   epic: [10, 24],
   nostalgic: [13, 23],
   curious: [7, 40],

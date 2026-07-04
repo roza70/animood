@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "../context/ThemeContext"
-import { getAnimeById, getAnimeCharacters, getAnimeEpisodes } from "../api/jikan"
+import { getAnimeById, getAnimeCharacters, getAnimeEpisodes, getAnimeRelations } from "../api/jikan"
 
-export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRate, onNote, isInWatchlist, userNote, userRating }) {
+export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRate, onNote, onCardClick, isInWatchlist, userNote, userRating }) {
   const { theme } = useTheme()
   const isDark = theme === "dark"
   const [anime, setAnime] = useState(initialAnime)
@@ -22,6 +22,7 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
   const [loadingEps, setLoadingEps] = useState(false)
   const [showTrailer, setShowTrailer] = useState(false)
   const [showRatingMenu, setShowRatingMenu] = useState(false)
+  const [relations, setRelations] = useState([])
 
   const ratings = [
     { label: "Masterpiece", emoji: "👑", color: "#ffd700" },
@@ -37,19 +38,42 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
   }, [])
 
   useEffect(() => {
+    setAnime(initialAnime)
+    setCharacters([])
+    setEpisodes([])
+    setEpisodePage(1)
+    setHasMoreEps(true)
+    setRelations([])
+    setShowTrailer(false)
+    setActiveTab("overview")
+    setEpisodeRatings(() => {
+      try { return JSON.parse(localStorage.getItem(`ep_ratings_${initialAnime?.mal_id}`) || "{}") }
+      catch { return {} }
+    })
+
     const load = async () => {
       try {
-        const [fullRes, charRes] = await Promise.all([
+        const [fullRes, charRes, relRes] = await Promise.all([
           getAnimeById(initialAnime.mal_id),
           getAnimeCharacters(initialAnime.mal_id),
+          getAnimeRelations(initialAnime.mal_id),
         ])
         setAnime(fullRes.data.data)
         setCharacters(charRes.data.data?.slice(0, 24) || [])
+
+        const related = relRes.data.data || []
+        const seasons = related
+          .filter(r => ["Sequel", "Prequel", "Side story", "Alternative version", "Summary", "Other"].includes(r.relation))
+          .flatMap(r => r.entry
+            .filter(e => e.type === "anime")
+            .map(e => ({ ...e, relation: r.relation }))
+          )
+        setRelations(seasons)
       } catch (err) { console.error(err) }
     }
     load()
     loadEpisodes(1)
-  }, [])
+  }, [initialAnime.mal_id])
 
   const loadEpisodes = async (page) => {
     try {
@@ -74,9 +98,19 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
     setEditRatingValue("")
   }
 
+  const handleRelatedClick = (related) => {
+    if (onCardClick) {
+      onClose()
+      setTimeout(() => onCardClick({ mal_id: related.mal_id, title: related.name }), 300)
+    }
+  }
+
   const saveNote = () => { onNote && onNote(anime, note) }
   const trailerUrl = anime?.trailer?.embed_url
-
+    ? anime.trailer.embed_url.includes("?")
+      ? `${anime.trailer.embed_url}&autoplay=1&rel=0`
+      : `${anime.trailer.embed_url}?autoplay=1&rel=0`
+    : null
   const bg = isDark ? "#020818" : "#fff0f5"
 
   const tabStyle = (active) => ({
@@ -90,6 +124,13 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
     borderBottom: active ? `2px solid ${isDark ? "#c8a8e9" : "#e91e8c"}` : "2px solid transparent",
     transition: "all 0.3s",
   })
+
+  const relationColor = (rel) => {
+    if (rel === "Sequel") return isDark ? "#c8a8e9" : "#e91e8c"
+    if (rel === "Prequel") return "#26c6da"
+    if (rel === "Side story") return "#ffb74d"
+    return isDark ? "#9b7fbf" : "#f06292"
+  }
 
   return (
     <motion.div
@@ -150,7 +191,7 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
               style={{ padding: "8px 16px", borderRadius: "16px", border: "none", background: "rgba(255,100,100,0.2)", color: "#ff6b6b", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>✕ Close Trailer</motion.button>
           )}
 
-          {/* Rate button */}
+          {/* Rate */}
           <div style={{ position: "relative" }}>
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowRatingMenu(!showRatingMenu)}
               style={{ padding: "8px 16px", borderRadius: "16px", border: "none", background: isDark ? "rgba(255,213,79,0.15)" : "rgba(255,152,0,0.15)", color: "#ffd700", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>
@@ -171,11 +212,40 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
             </AnimatePresence>
           </div>
 
+          {/* Genres */}
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {anime?.genres?.map(g => (
               <span key={g.mal_id} style={{ padding: "5px 12px", borderRadius: "12px", background: isDark ? "rgba(200,168,233,0.1)" : "rgba(233,30,140,0.08)", color: isDark ? "#c8a8e9" : "#e91e8c", fontSize: "11px", fontWeight: "600" }}>{g.name}</span>
             ))}
           </div>
+
+          {/* Related seasons */}
+          {relations.length > 0 && (
+            <div style={{ width: "100%", marginTop: 6 }}>
+              <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "11px", fontWeight: "700", margin: "0 0 8px 0", textTransform: "uppercase", letterSpacing: "1px" }}>
+                📺 Related Seasons & Entries
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {relations.map(r => (
+                  <motion.button
+                    key={r.mal_id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleRelatedClick(r)}
+                    style={{
+                      padding: "6px 14px", borderRadius: "12px", border: `1px solid ${relationColor(r.relation)}40`,
+                      background: `${relationColor(r.relation)}15`,
+                      color: relationColor(r.relation),
+                      fontSize: "11px", fontWeight: "600", cursor: "pointer",
+                    }}
+                  >
+                    {r.relation === "Sequel" ? "▶ " : r.relation === "Prequel" ? "◀ " : "• "}
+                    {r.name}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
@@ -269,53 +339,19 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
                   <>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(clamp(160px, 20vw, 220px), 1fr))", gap: "clamp(8px, 1.5vw, 12px)" }}>
                       {episodes.map((ep, i) => (
-                        <motion.div key={ep.mal_id}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: Math.min(i * 0.02, 0.3) }}
-                          style={{
-                            padding: "clamp(10px, 2vw, 14px)",
-                            borderRadius: "12px",
-                            background: episodeRatings[ep.mal_id]
-                              ? isDark ? "rgba(200,168,233,0.12)" : "rgba(233,30,140,0.08)"
-                              : isDark ? "rgba(200,168,233,0.04)" : "rgba(233,30,140,0.03)",
-                            border: episodeRatings[ep.mal_id]
-                              ? isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)"
-                              : isDark ? "1px solid rgba(200,168,233,0.08)" : "1px solid rgba(233,30,140,0.08)",
-                          }}
-                        >
-                          {/* EP number */}
-                          <div style={{ color: isDark ? "#c8a8e9" : "#e91e8c", fontSize: "11px", fontWeight: "700", marginBottom: 4 }}>
-                            EP {ep.mal_id}
-                          </div>
-                          {/* EP name */}
+                        <motion.div key={ep.mal_id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: Math.min(i * 0.02, 0.3) }}
+                          style={{ padding: "clamp(10px, 2vw, 14px)", borderRadius: "12px", background: episodeRatings[ep.mal_id] ? isDark ? "rgba(200,168,233,0.12)" : "rgba(233,30,140,0.08)" : isDark ? "rgba(200,168,233,0.04)" : "rgba(233,30,140,0.03)", border: episodeRatings[ep.mal_id] ? isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)" : isDark ? "1px solid rgba(200,168,233,0.08)" : "1px solid rgba(233,30,140,0.08)" }}>
+                          <div style={{ color: isDark ? "#c8a8e9" : "#e91e8c", fontSize: "11px", fontWeight: "700", marginBottom: 4 }}>EP {ep.mal_id}</div>
                           <div style={{ color: isDark ? "#e8d5f5" : "#c2185b", fontSize: "clamp(11px, 1.3vw, 13px)", fontWeight: "600", marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", lineHeight: 1.4, minHeight: "2.8em" }}>
                             {ep.title || `Episode ${ep.mal_id}`}
                           </div>
-                          {/* Jikan score */}
                           {ep.score && <div style={{ color: "#ffd700", fontSize: "11px", marginBottom: 6 }}>⭐ {ep.score}</div>}
-
-                          {/* My rating */}
                           {editingEp === ep.mal_id ? (
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                              <input
-                                autoFocus
-                                type="number" min="1" max="10"
-                                value={editRatingValue}
-                                onChange={e => setEditRatingValue(e.target.value)}
-                                onKeyDown={e => {
-                                  if (e.key === "Enter") saveEpisodeRating(ep.mal_id, editRatingValue)
-                                  if (e.key === "Escape") { setEditingEp(null); setEditRatingValue("") }
-                                }}
+                              <input autoFocus type="number" min="1" max="10" value={editRatingValue} onChange={e => setEditRatingValue(e.target.value)}
+                                onKeyDown={e => { if (e.key === "Enter") saveEpisodeRating(ep.mal_id, editRatingValue); if (e.key === "Escape") { setEditingEp(null); setEditRatingValue("") } }}
                                 placeholder="1-10"
-                                style={{
-                                  width: 52, padding: "4px 8px", borderRadius: "8px",
-                                  border: isDark ? "1px solid rgba(200,168,233,0.4)" : "1px solid rgba(233,30,140,0.4)",
-                                  background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)",
-                                  color: isDark ? "#e8d5f5" : "#c2185b",
-                                  fontSize: "13px", outline: "none", textAlign: "center",
-                                }}
-                              />
+                                style={{ width: 52, padding: "4px 8px", borderRadius: "8px", border: isDark ? "1px solid rgba(200,168,233,0.4)" : "1px solid rgba(233,30,140,0.4)", background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: isDark ? "#e8d5f5" : "#c2185b", fontSize: "13px", outline: "none", textAlign: "center" }} />
                               <motion.button whileHover={{ scale: 1.1 }} onClick={() => saveEpisodeRating(ep.mal_id, editRatingValue)}
                                 style={{ padding: "4px 10px", borderRadius: "8px", border: "none", background: isDark ? "rgba(200,168,233,0.3)" : "rgba(233,30,140,0.2)", color: isDark ? "#e8d5f5" : "#e91e8c", fontSize: "11px", fontWeight: "700", cursor: "pointer" }}>✓</motion.button>
                               <motion.button whileHover={{ scale: 1.1 }} onClick={() => { setEditingEp(null); setEditRatingValue("") }}
@@ -324,24 +360,13 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
                           ) : (
                             <motion.button whileHover={{ scale: 1.05 }}
                               onClick={() => { setEditingEp(ep.mal_id); setEditRatingValue(episodeRatings[ep.mal_id]?.toString() || "") }}
-                              style={{
-                                padding: "5px 12px", borderRadius: "8px", border: "none", width: "100%",
-                                background: episodeRatings[ep.mal_id]
-                                  ? isDark ? "rgba(200,168,233,0.25)" : "rgba(233,30,140,0.2)"
-                                  : isDark ? "rgba(200,168,233,0.08)" : "rgba(233,30,140,0.06)",
-                                color: episodeRatings[ep.mal_id]
-                                  ? isDark ? "#e8d5f5" : "#e91e8c"
-                                  : isDark ? "#9b7fbf" : "#f06292",
-                                fontSize: "12px", fontWeight: "600", cursor: "pointer",
-                              }}
-                            >
+                              style={{ padding: "5px 12px", borderRadius: "8px", border: "none", width: "100%", background: episodeRatings[ep.mal_id] ? isDark ? "rgba(200,168,233,0.25)" : "rgba(233,30,140,0.2)" : isDark ? "rgba(200,168,233,0.08)" : "rgba(233,30,140,0.06)", color: episodeRatings[ep.mal_id] ? isDark ? "#e8d5f5" : "#e91e8c" : isDark ? "#9b7fbf" : "#f06292", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}>
                               {episodeRatings[ep.mal_id] ? `My Rating: ${episodeRatings[ep.mal_id]}/10` : "Rate Episode"}
                             </motion.button>
                           )}
                         </motion.div>
                       ))}
                     </div>
-
                     {hasMoreEps && (
                       <div style={{ textAlign: "center", marginTop: 24 }}>
                         <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => loadEpisodes(episodePage + 1)}
