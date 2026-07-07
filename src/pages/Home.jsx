@@ -1,4 +1,3 @@
-// codes
 import MyList from "./MyList"
 import Browse from "./Browse"
 import { useState, useEffect } from "react"
@@ -418,6 +417,7 @@ export default function Home({ user, onLogout }) {
             onAdd={handleAdd}
             onRate={handleRate}
             onNote={handleNote}
+            onCardClick={handleCardClick}
             isInWatchlist={watchlist.some(w => w.mal_id === selectedAnime.mal_id)}
             userNote={notes[selectedAnime.mal_id]}
             userRating={ratings[selectedAnime.mal_id]}
