@@ -12,7 +12,6 @@ import DarkCharacter from "../components/Character/DarkCharacter"
 import LightCharacter from "../components/Character/LightCharacter"
 import DarkPixelBackground from "../components/Character/DarkPixelBackground"
 import LightPixelBackground from "../components/Character/LightPixelBackground"
-import useUserData from "../hooks/useUserData"
 import {
   getTrending, getTopRated, getNewReleases,
   getByGenre, GENRES, MOOD_GENRES
@@ -49,10 +48,22 @@ export default function Home({ user, onLogout }) {
   const [showBrowse, setShowBrowse] = useState(false)
   const [selectedAnime, setSelectedAnime] = useState(null)
 
-  const {
-    watchlist, ratings, notes, statuses,
-    setWatchlist, setRatings, setNotes, setStatuses,
-  } = useUserData(user?.uid)
+  const [watchlist, setWatchlist] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(`animood_watchlist_${user?.email}`) || "[]") }
+    catch { return [] }
+  })
+  const [ratings, setRatings] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(`animood_ratings_${user?.email}`) || "{}") }
+    catch { return {} }
+  })
+  const [notes, setNotes] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(`animood_notes_${user?.email}`) || "{}") }
+    catch { return {} }
+  })
+  const [statuses, setStatuses] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(`animood_statuses_${user?.email}`) || "{}") }
+    catch { return {} }
+  })
   const [toast, setToast] = useState(null)
 
   const showToast = (msg) => {
@@ -60,7 +71,26 @@ export default function Home({ user, onLogout }) {
     setTimeout(() => setToast(null), 3000)
   }
 
-
+  const saveWatchlist = (updated) => {
+    setWatchlist(updated)
+    try { localStorage.setItem(`animood_watchlist_${user?.email}`, JSON.stringify(updated)) }
+    catch (e) { console.error("Failed to save watchlist", e) }
+  }
+  const saveRatings = (updated) => {
+    setRatings(updated)
+    try { localStorage.setItem(`animood_ratings_${user?.email}`, JSON.stringify(updated)) }
+    catch (e) { console.error("Failed to save ratings", e) }
+  }
+  const saveNotes = (updated) => {
+    setNotes(updated)
+    try { localStorage.setItem(`animood_notes_${user?.email}`, JSON.stringify(updated)) }
+    catch (e) { console.error("Failed to save notes", e) }
+  }
+  const saveStatuses = (updated) => {
+    setStatuses(updated)
+    try { localStorage.setItem(`animood_statuses_${user?.email}`, JSON.stringify(updated)) }
+    catch (e) { console.error("Failed to save statuses", e) }
+  }
 
   const resetAll = () => {
     setShowMyList(false)
@@ -114,24 +144,24 @@ export default function Home({ user, onLogout }) {
       updated = [...watchlist, anime]
       showToast(`Added "${anime.title_english || anime.title}" to watchlist ✦`)
     }
-    setWatchlist(updated)
+    saveWatchlist(updated)
   }
 
   const handleRate = (anime, rating) => {
     const updated = { ...ratings, [anime.mal_id]: rating }
-    setRatings(updated)
+    saveRatings(updated)
     showToast(`Rated "${anime.title_english || anime.title}" as ${rating}! ✦`)
   }
 
   const handleNote = (anime, note) => {
     const updated = { ...notes, [anime.mal_id]: note }
-    setNotes(updated)
+    saveNotes(updated)
     showToast(`Note saved! 📝`)
   }
 
   const handleStatus = (anime, status) => {
     const updated = { ...statuses, [anime.mal_id]: status }
-    setStatuses(updated)
+    saveStatuses(updated)
     const labels = { watching: "Watching", completed: "Completed", onhold: "On Hold", dropped: "Dropped", plantowatch: "Plan to Watch" }
     showToast(`Marked as ${labels[status] || status}! ✦`)
   }
