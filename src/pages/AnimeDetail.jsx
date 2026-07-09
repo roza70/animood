@@ -231,7 +231,7 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
                 style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 60, height: 60, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.9)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "20px", boxShadow: "0 4px 20px rgba(0,0,0,0.5)", zIndex: 3 }}>▶</motion.button>
             )}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(12px,3vw,24px)", zIndex: 3 }}>
-              <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px,3vw,28px)", fontWeight: "bold", color: "white", margin: "0 0 8px 0", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
+              <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(14px,3vw,28px)", fontWeight: "bold", color: "white", margin: "0 0 8px 0", textShadow: "0 2px 8px rgba(0,0,0,0.8)", lineHeight: 1.2, wordBreak: "break-word" }}>
                 {anime?.title_english || anime?.title}
               </h1>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>

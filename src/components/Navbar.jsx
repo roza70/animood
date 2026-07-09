@@ -114,7 +114,7 @@ export default function Navbar({ user, onLogout, onSearch, onMyList, onBrowse, o
 
         {/* Hamburger — mobile only */}
         <motion.button onClick={() => setMenuOpen(!menuOpen)} whileTap={{ scale: 0.9 }}
-          style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "22px", color: isDark ? "#c8a8e9" : "#e91e8c", display: "flex", alignItems: "center", padding: 4 }}
+          style={{ background: isDark ? "rgba(200,168,233,0.15)" : "rgba(255,255,255,0.3)", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(255,255,255,0.5)", borderRadius: "10px", cursor: "pointer", fontSize: "20px", color: isDark ? "#c8a8e9" : "white", display: "flex", alignItems: "center", justifyContent: "center", padding: "6px 10px", backdropFilter: "blur(10px)" }}
           className="md:hidden">
           {menuOpen ? "✕" : "☰"}
         </motion.button>
