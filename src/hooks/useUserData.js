@@ -1,75 +1,114 @@
-import { useState, useEffect } from "react"
-import { doc, getDoc, setDoc } from "firebase/firestore"
+import { useState, useEffect, useRef } from "react"
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore"
 import { db } from "../firebase"
 
-// Syncs watchlist, ratings, notes, statuses to Firestore
-// Falls back to localStorage if offline
 export default function useUserData(uid) {
   const [watchlist, setWatchlistState] = useState([])
   const [ratings, setRatingsState] = useState({})
   const [notes, setNotesState] = useState({})
   const [statuses, setStatusesState] = useState({})
   const [loaded, setLoaded] = useState(false)
+  const dataRef = useRef({ watchlist: [], ratings: {}, notes: {}, statuses: {} })
 
-  // Load from Firestore on mount
   useEffect(() => {
     if (!uid) return
-    const load = async () => {
-      try {
-        const snap = await getDoc(doc(db, "userData", uid))
-        if (snap.exists()) {
-          const data = snap.data()
-          setWatchlistState(data.watchlist || [])
-          setRatingsState(data.ratings || {})
-          setNotesState(data.notes || {})
-          setStatusesState(data.statuses || {})
-        }
-      } catch (err) {
-        // Offline — fall back to localStorage
-        console.warn("Firestore offline, using localStorage", err)
-        setWatchlistState(JSON.parse(localStorage.getItem(`animood_watchlist_${uid}`) || "[]"))
-        setRatingsState(JSON.parse(localStorage.getItem(`animood_ratings_${uid}`) || "{}"))
-        setNotesState(JSON.parse(localStorage.getItem(`animood_notes_${uid}`) || "{}"))
-        setStatusesState(JSON.parse(localStorage.getItem(`animood_statuses_${uid}`) || "{}"))
+
+    // Real-time listener — syncs instantly across all devices
+    const unsub = onSnapshot(doc(db, "userData", uid), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data()
+        const wl = data.watchlist || []
+        const rt = data.ratings || {}
+        const nt = data.notes || {}
+        const st = data.statuses || {}
+        setWatchlistState(wl)
+        setRatingsState(rt)
+        setNotesState(nt)
+        setStatusesState(st)
+        dataRef.current = { watchlist: wl, ratings: rt, notes: nt, statuses: st }
+        // Also cache locally
+        try {
+          localStorage.setItem(`animood_watchlist_${uid}`, JSON.stringify(wl))
+          localStorage.setItem(`animood_ratings_${uid}`, JSON.stringify(rt))
+          localStorage.setItem(`animood_notes_${uid}`, JSON.stringify(nt))
+          localStorage.setItem(`animood_statuses_${uid}`, JSON.stringify(st))
+        } catch (e) {}
+      } else {
+        // No Firestore doc yet — try localStorage
+        try {
+          const wl = JSON.parse(localStorage.getItem(`animood_watchlist_${uid}`) || "[]")
+          const rt = JSON.parse(localStorage.getItem(`animood_ratings_${uid}`) || "{}")
+          const nt = JSON.parse(localStorage.getItem(`animood_notes_${uid}`) || "{}")
+          const st = JSON.parse(localStorage.getItem(`animood_statuses_${uid}`) || "{}")
+          setWatchlistState(wl)
+          setRatingsState(rt)
+          setNotesState(nt)
+          setStatusesState(st)
+          dataRef.current = { watchlist: wl, ratings: rt, notes: nt, statuses: st }
+          // Push local data to Firestore if any exists
+          if (wl.length > 0 || Object.keys(rt).length > 0) {
+            setDoc(doc(db, "userData", uid), { watchlist: wl, ratings: rt, notes: nt, statuses: st })
+              .catch(e => console.warn("Failed to push local data to Firestore", e))
+          }
+        } catch (e) {}
       }
       setLoaded(true)
-    }
-    load()
+    }, (err) => {
+      // Offline fallback
+      console.warn("Firestore offline, using localStorage", err)
+      try {
+        const wl = JSON.parse(localStorage.getItem(`animood_watchlist_${uid}`) || "[]")
+        const rt = JSON.parse(localStorage.getItem(`animood_ratings_${uid}`) || "{}")
+        const nt = JSON.parse(localStorage.getItem(`animood_notes_${uid}`) || "{}")
+        const st = JSON.parse(localStorage.getItem(`animood_statuses_${uid}`) || "{}")
+        setWatchlistState(wl)
+        setRatingsState(rt)
+        setNotesState(nt)
+        setStatusesState(st)
+        dataRef.current = { watchlist: wl, ratings: rt, notes: nt, statuses: st }
+      } catch (e) {}
+      setLoaded(true)
+    })
+
+    return () => unsub()
   }, [uid])
 
-  const save = async (data) => {
+  const save = async (newData) => {
     if (!uid) return
-    // Always save to localStorage as backup
-    localStorage.setItem(`animood_watchlist_${uid}`, JSON.stringify(data.watchlist))
-    localStorage.setItem(`animood_ratings_${uid}`, JSON.stringify(data.ratings))
-    localStorage.setItem(`animood_notes_${uid}`, JSON.stringify(data.notes))
-    localStorage.setItem(`animood_statuses_${uid}`, JSON.stringify(data.statuses))
+    dataRef.current = newData
+    // Save to localStorage immediately
+    try {
+      localStorage.setItem(`animood_watchlist_${uid}`, JSON.stringify(newData.watchlist))
+      localStorage.setItem(`animood_ratings_${uid}`, JSON.stringify(newData.ratings))
+      localStorage.setItem(`animood_notes_${uid}`, JSON.stringify(newData.notes))
+      localStorage.setItem(`animood_statuses_${uid}`, JSON.stringify(newData.statuses))
+    } catch (e) {}
     // Save to Firestore
     try {
-      await setDoc(doc(db, "userData", uid), data, { merge: true })
+      await setDoc(doc(db, "userData", uid), newData, { merge: true })
     } catch (err) {
-      console.warn("Firestore save failed, data saved locally", err)
+      console.warn("Firestore save failed, saved locally only", err)
     }
   }
 
   const setWatchlist = async (updated) => {
     setWatchlistState(updated)
-    await save({ watchlist: updated, ratings, notes, statuses })
+    await save({ ...dataRef.current, watchlist: updated })
   }
 
   const setRatings = async (updated) => {
     setRatingsState(updated)
-    await save({ watchlist, ratings: updated, notes, statuses })
+    await save({ ...dataRef.current, ratings: updated })
   }
 
   const setNotes = async (updated) => {
     setNotesState(updated)
-    await save({ watchlist, ratings, notes: updated, statuses })
+    await save({ ...dataRef.current, notes: updated })
   }
 
   const setStatuses = async (updated) => {
     setStatusesState(updated)
-    await save({ watchlist, ratings, notes, statuses: updated })
+    await save({ ...dataRef.current, statuses: updated })
   }
 
   return { watchlist, ratings, notes, statuses, setWatchlist, setRatings, setNotes, setStatuses, loaded }
