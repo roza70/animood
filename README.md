@@ -24,7 +24,7 @@ A Netflix-style anime discovery app that recommends anime based on your mood. Bu
 
 ## Screenshots
 
-| Dark Mode (Princess) | Light Mode (Prince) |
+| Dark Mode  | Light Mode |
 |---|---|
 | ![Dark hero](./screenshots/hero-dark.png) | ![Light hero](./screenshots/hero-light.png) |
 
