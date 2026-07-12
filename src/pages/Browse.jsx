@@ -165,7 +165,7 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
             )}
           </div>
           <p style={{
-            color: isDark ? "#e8d5f5" : "#c2185b",
+            color: isDark ? "#e8d5f5" : "#7a4050",
             fontSize: "clamp(11px, 1.3vw, 13px)", fontWeight: "600",
             margin: "8px 0 2px 0",
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
@@ -173,7 +173,7 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
             {anime.title_english || anime.title}
           </p>
           {anime.genres?.length > 0 && (
-            <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "10px", margin: 0 }}>
+            <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: "10px", margin: 0 }}>
               {anime.genres.slice(0, 2).map(g => g.name).join(" · ")}
             </p>
           )}
@@ -191,10 +191,10 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
     }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: "clamp(20px, 4vw, 32px)" }}>
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(22px, 4vw, 40px)", fontWeight: "bold", color: isDark ? "#e8d5f5" : "#e91e8c", margin: "0 0 8px 0" }}>
+        <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(22px, 4vw, 40px)", fontWeight: "bold", color: isDark ? "#e8d5f5" : "#b06070", margin: "0 0 8px 0" }}>
           ✦ Browse Anime
         </h1>
-        <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "14px", margin: 0 }}>
+        <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: "14px", margin: 0 }}>
           Search by name or pick a genre — load more for 100+ anime
         </p>
       </motion.div>
@@ -211,9 +211,9 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
             flex: 1, minWidth: "200px",
             padding: "clamp(12px, 2vw, 16px) 24px",
             borderRadius: "24px",
-            border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)",
+            border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,100,110,0.2)",
             background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.8)",
-            color: isDark ? "#e8d5f5" : "#c2185b",
+            color: isDark ? "#e8d5f5" : "#7a4050",
             fontSize: "clamp(13px, 1.8vw, 15px)",
             outline: "none",
           }}
@@ -221,7 +221,7 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
         <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit"
           style={{
             padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "24px", border: "none",
-            background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #e91e8c, #f48fb1)",
+            background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #b06070, #d4a0a8)",
             color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer",
           }}
         >{searching ? "Searching..." : "🔍 Search"}</motion.button>
@@ -243,12 +243,12 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
         {searchResults && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ marginBottom: 48 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: 0 }}>
+              <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#b06070", margin: 0 }}>
                 🔍 "{searchQuery}" — {searchResults.length} results
               </h2>
               <motion.button whileHover={{ scale: 1.05 }}
                 onClick={() => { setSearchResults(null); setSearchQuery("") }}
-                style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)", background: "transparent", color: isDark ? "#c8a8e9" : "#e91e8c", cursor: "pointer", fontSize: "13px" }}
+                style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,100,110,0.2)", background: "transparent", color: isDark ? "#c8a8e9" : "#b06070", cursor: "pointer", fontSize: "13px" }}
               >Clear ✕</motion.button>
             </div>
             <AnimeGrid animeList={searchResults} />
@@ -256,7 +256,7 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
               <div style={{ textAlign: "center", marginTop: 32 }}>
                 <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                   onClick={() => handleSearch(null, searchPage + 1)}
-                  style={{ padding: "12px 32px", borderRadius: "24px", border: "none", background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #e91e8c, #f48fb1)", color: "white", fontSize: "14px", fontWeight: "700", cursor: "pointer" }}
+                  style={{ padding: "12px 32px", borderRadius: "24px", border: "none", background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #b06070, #d4a0a8)", color: "white", fontSize: "14px", fontWeight: "700", cursor: "pointer" }}
                 >{loadingMore ? "Loading..." : "Load More →"}</motion.button>
               </div>
             )}
@@ -268,7 +268,7 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
       {!searchResults && (
         <>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} style={{ marginBottom: 28 }}>
-            <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: "0 0 16px 0" }}>
+            <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#b06070", margin: "0 0 16px 0" }}>
               Browse by Genre
             </h2>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
@@ -285,17 +285,17 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
                     padding: "8px 18px", borderRadius: "20px", border: "none",
                     cursor: "pointer", fontSize: "clamp(12px, 1.5vw, 13px)", fontWeight: "600",
                     background: selectedGenre?.key === g.key
-                      ? isDark ? "rgba(200,168,233,0.35)" : "rgba(233,30,140,0.25)"
+                      ? isDark ? "rgba(200,168,233,0.35)" : "rgba(180,100,110,0.18)"
                       : isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.6)",
                     color: selectedGenre?.key === g.key
-                      ? isDark ? "#e8d5f5" : "#e91e8c"
-                      : isDark ? "#c8a8e9" : "#c2185b",
+                      ? isDark ? "#e8d5f5" : "#b06070"
+                      : isDark ? "#c8a8e9" : "#7a4050",
                     border: selectedGenre?.key === g.key
-                      ? isDark ? "1px solid rgba(200,168,233,0.5)" : "1px solid rgba(233,30,140,0.5)"
-                      : isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(233,30,140,0.2)",
+                      ? isDark ? "1px solid rgba(200,168,233,0.5)" : "1px solid rgba(180,100,110,0.35)"
+                      : isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(180,100,110,0.15)",
                     backdropFilter: "blur(10px)", transition: "all 0.3s",
                     boxShadow: selectedGenre?.key === g.key
-                      ? isDark ? "0 0 20px rgba(200,168,233,0.25)" : "0 0 20px rgba(233,30,140,0.25)"
+                      ? isDark ? "0 0 20px rgba(200,168,233,0.25)" : "0 0 20px rgba(180,100,110,0.15)"
                       : "none",
                   }}
                 >{g.emoji} {g.label}</motion.button>
@@ -307,7 +307,7 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
           <AnimatePresence>
             {selectedGenre && (
               <motion.div key={selectedGenre.key} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(18px, 3vw, 26px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: "0 0 20px 0" }}>
+                <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(18px, 3vw, 26px)", color: isDark ? "#e8d5f5" : "#b06070", margin: "0 0 20px 0" }}>
                   {selectedGenre.emoji} {selectedGenre.label} — {genreAnime.length} anime
                 </h2>
 
@@ -315,7 +315,7 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(clamp(130px, 14vw, 170px), 1fr))", gap: "clamp(12px, 2vw, 20px)" }}>
                     {Array.from({ length: 25 }).map((_, i) => (
                       <motion.div key={i}
-                        style={{ aspectRatio: "2/3", borderRadius: "14px", background: isDark ? "rgba(200,168,233,0.1)" : "rgba(233,30,140,0.08)" }}
+                        style={{ aspectRatio: "2/3", borderRadius: "14px", background: isDark ? "rgba(200,168,233,0.1)" : "rgba(180,100,110,0.06)" }}
                         animate={{ opacity: [0.4, 0.8, 0.4] }}
                         transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.05 }}
                       />
@@ -331,14 +331,14 @@ export default function Browse({ watchlist, onAdd, onRate, onNote, notes, onCard
                           onClick={() => loadGenre(selectedGenre, genrePage + 1)}
                           style={{
                             padding: "14px 40px", borderRadius: "24px", border: "none",
-                            background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #e91e8c, #f48fb1)",
+                            background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #b06070, #d4a0a8)",
                             color: "white", fontSize: "15px", fontWeight: "700", cursor: "pointer",
                             boxShadow: isDark ? "0 4px 20px rgba(200,168,233,0.3)" : "0 4px 20px rgba(233,30,140,0.3)",
                           }}
                         >
                           {loadingMore ? "Loading..." : `Load More ${selectedGenre.emoji} (+25)`}
                         </motion.button>
-                        <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "12px", marginTop: 8 }}>
+                        <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: "12px", marginTop: 8 }}>
                           Showing {genreAnime.length} anime — keep loading for more!
                         </p>
                       </div>

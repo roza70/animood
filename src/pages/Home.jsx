@@ -166,7 +166,7 @@ export default function Home({ user, onLogout }) {
   const fullPageStyle = {
     position: "fixed", inset: 0, zIndex: 50,
     overflowY: "auto",
-    background: isDark ? "#020818" : "#fff0f5",
+    background: isDark ? "#020818" : "#faf6f2",
   }
 
   const closeBtnStyle = {
@@ -175,9 +175,9 @@ export default function Home({ user, onLogout }) {
     right: "clamp(12px, 3vw, 32px)",
     zIndex: 200, width: 40, height: 40,
     borderRadius: "50%",
-    border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)",
+    border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,130,140,0.25)",
     background: isDark ? "rgba(10,5,40,0.95)" : "rgba(255,240,245,0.95)",
-    color: isDark ? "#c8a8e9" : "#e91e8c",
+    color: isDark ? "#c8a8e9" : "#b06070",
     fontSize: "18px", cursor: "pointer",
     backdropFilter: "blur(10px)",
     display: "flex", alignItems: "center", justifyContent: "center",
@@ -191,7 +191,7 @@ export default function Home({ user, onLogout }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative", background: isDark ? "#020818" : "#fff0f5" }}>
+    <div style={{ minHeight: "100vh", position: "relative", background: isDark ? "#020818" : "#faf6f2" }}>
 
       {renderBackground()}
 
@@ -228,11 +228,11 @@ export default function Home({ user, onLogout }) {
             <AnimatePresence>
               {searchResults && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  style={{ padding: "clamp(16px, 4vw, 48px)", background: isDark ? "#020818" : "#fff0f5", minHeight: "100vh" }}>
+                  style={{ padding: "clamp(16px, 4vw, 48px)", background: isDark ? "#020818" : "#faf6f2", minHeight: "100vh" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: 0 }}>🔍 Search Results</h2>
+                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#b06070", margin: 0 }}>🔍 Search Results</h2>
                     <motion.button whileHover={{ scale: 1.05 }} onClick={() => setSearchResults(null)}
-                      style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)", background: "transparent", color: isDark ? "#c8a8e9" : "#e91e8c", cursor: "pointer", fontSize: "13px" }}>
+                      style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,130,140,0.25)", background: "transparent", color: isDark ? "#c8a8e9" : "#b06070", cursor: "pointer", fontSize: "13px" }}>
                       Clear ✕
                     </motion.button>
                   </div>
@@ -258,7 +258,7 @@ export default function Home({ user, onLogout }) {
                 <motion.h1 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
                   style={{ fontFamily: "Georgia, serif", fontSize: "clamp(28px, 6vw, 72px)", fontWeight: "bold", color: "white", margin: "0 0 16px 0", lineHeight: 1.1, textShadow: "0 2px 4px rgba(0,0,0,0.9), 0 4px 20px rgba(0,0,0,0.8)", maxWidth: "700px" }}>
                   Discover Anime<br />
-                  <span style={{ color: isDark ? "#c8a8e9" : "#ffb7c5" }}>By Your Mood</span>
+                  <span style={{ color: isDark ? "#c8a8e9" : "#d4a0a8" }}>By Your Mood</span>
                 </motion.h1>
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
                   style={{ color: "white", fontSize: "clamp(13px, 2vw, 17px)", margin: "0 0 32px 0", maxWidth: "500px", lineHeight: 1.6, textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
@@ -267,18 +267,54 @@ export default function Home({ user, onLogout }) {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                   <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.97 }}
                     onClick={() => window.scrollTo({ top: window.innerHeight * 0.9, behavior: "smooth" })}
-                    style={{ padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "16px", background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #e91e8c, #f48fb1)", color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer", fontFamily: "Georgia, serif", boxShadow: isDark ? "0 8px 30px rgba(200,168,233,0.4)" : "0 8px 30px rgba(233,30,140,0.4)", display: "flex", alignItems: "center", gap: 10 }}>
+                    style={{ padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "16px", background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #b06070, #d4a0a8)", color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer", fontFamily: "Georgia, serif", boxShadow: isDark ? "0 8px 30px rgba(200,168,233,0.4)" : "0 8px 30px rgba(180,100,110,0.3)", display: "flex", alignItems: "center", gap: 10 }}>
                     ✦ Start Exploring Free →
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.97 }} onClick={handleBrowse}
-                    style={{ padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "16px", background: "rgba(255,255,255,0.12)", border: "2px solid rgba(255,255,255,0.3)", color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer", fontFamily: "Georgia, serif", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", gap: 10 }}>
+                    style={{ padding: "clamp(12px, 2vw, 16px) clamp(20px, 3vw, 32px)", borderRadius: "16px", background: "rgba(255,255,255,0.25)", border: "2px solid rgba(255,255,255,0.7)", color: "white", fontSize: "clamp(13px, 1.8vw, 15px)", fontWeight: "700", cursor: "pointer", fontFamily: "Georgia, serif", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", gap: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.2)" }}>
                     🎭 Browse All Anime
                   </motion.div>
                 </motion.div>
+
+                {/* Search bar below buttons */}
+                <motion.form
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  onSubmit={async (e) => {
+                    e.preventDefault()
+                    const q = e.target.querySelector("input").value
+                    if (!q.trim()) return
+                    try {
+                      const { searchAnime } = await import("../api/jikan")
+                      const res = await searchAnime(q)
+                      handleSearch(res.data.data)
+                    } catch (err) { console.error(err) }
+                  }}
+                  style={{ display: "flex", gap: 10, marginTop: 20, maxWidth: 480, flexWrap: "wrap" }}
+                >
+                  <input
+                    type="text"
+                    placeholder="🔍  Search any anime..."
+                    style={{
+                      flex: 1, minWidth: 200,
+                      padding: "12px 20px", borderRadius: "20px",
+                      border: "2px solid rgba(255,255,255,0.5)",
+                      background: "rgba(255,255,255,0.18)",
+                      color: "white", fontSize: "14px", outline: "none",
+                      backdropFilter: "blur(10px)",
+                    }}
+                  />
+                  <motion.button type="submit" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                    style={{ padding: "12px 22px", borderRadius: "20px", border: "none", background: isDark ? "linear-gradient(135deg,#7b1fa2,#c8a8e9)" : "linear-gradient(135deg,#b06070,#d4a0a8)", color: "white", fontWeight: "700", cursor: "pointer", fontSize: "14px" }}>
+                    Search
+                  </motion.button>
+                </motion.form>
+
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} style={{ display: "flex", gap: "clamp(20px, 4vw, 40px)", marginTop: 40, flexWrap: "wrap" }}>
                   {[{ num: "1000+", label: "Anime" }, { num: "12", label: "Moods" }, { num: "Free", label: "Forever" }].map((stat, i) => (
                     <div key={i}>
-                      <div style={{ fontFamily: "Georgia, serif", fontSize: "clamp(20px, 3vw, 28px)", fontWeight: "bold", color: isDark ? "#c8a8e9" : "#ffb7c5" }}>{stat.num}</div>
+                      <div style={{ fontFamily: "Georgia, serif", fontSize: "clamp(20px, 3vw, 28px)", fontWeight: "bold", color: isDark ? "#c8a8e9" : "#d4a0a8" }}>{stat.num}</div>
                       <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "clamp(11px, 1.3vw, 13px)", fontWeight: "600" }}>{stat.label}</div>
                     </div>
                   ))}
@@ -288,7 +324,7 @@ export default function Home({ user, onLogout }) {
 
             {/* Mood picker */}
             {!searchResults && (
-              <div style={{ background: isDark ? "#020818" : "#fff0f5", padding: "clamp(20px, 4vw, 40px) 0" }}>
+              <div style={{ background: isDark ? "#020818" : "#faf6f2", padding: "clamp(20px, 4vw, 40px) 0" }}>
                 <MoodPicker onMoodSelect={handleMoodSelect} selectedMood={selectedMood} />
               </div>
             )}
@@ -297,13 +333,13 @@ export default function Home({ user, onLogout }) {
             <AnimatePresence>
               {selectedMood && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  style={{ padding: "0 clamp(16px, 4vw, 48px)", background: isDark ? "#020818" : "#fff0f5", minHeight: "60vh" }}>
+                  style={{ padding: "0 clamp(16px, 4vw, 48px)", background: isDark ? "#020818" : "#faf6f2", minHeight: "60vh" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 24, marginBottom: 20 }}>
-                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#e91e8c", margin: 0 }}>
+                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px, 2.5vw, 22px)", color: isDark ? "#e8d5f5" : "#b06070", margin: 0 }}>
                       {selectedMood.emoji} {selectedMood.label} Picks — {moodAnime.length} anime
                     </h2>
                     <motion.button whileHover={{ scale: 1.05 }} onClick={() => { setSelectedMood(null); setMoodAnime([]) }}
-                      style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)", background: "transparent", color: isDark ? "#c8a8e9" : "#e91e8c", cursor: "pointer", fontSize: "13px" }}>
+                      style={{ padding: "6px 16px", borderRadius: "20px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,130,140,0.25)", background: "transparent", color: isDark ? "#c8a8e9" : "#b06070", cursor: "pointer", fontSize: "13px" }}>
                       Clear ✕
                     </motion.button>
                   </div>
@@ -326,10 +362,10 @@ export default function Home({ user, onLogout }) {
                       {hasMoreMood && (
                         <div style={{ textAlign: "center", paddingBottom: 40 }}>
                           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={loadMoreMood}
-                            style={{ padding: "14px 40px", borderRadius: "24px", border: "none", background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #e91e8c, #f48fb1)", color: "white", fontSize: "15px", fontWeight: "700", cursor: "pointer", boxShadow: isDark ? "0 4px 20px rgba(200,168,233,0.3)" : "0 4px 20px rgba(233,30,140,0.3)" }}>
+                            style={{ padding: "14px 40px", borderRadius: "24px", border: "none", background: isDark ? "linear-gradient(135deg, #7b1fa2, #c8a8e9)" : "linear-gradient(135deg, #b06070, #d4a0a8)", color: "white", fontSize: "15px", fontWeight: "700", cursor: "pointer", boxShadow: isDark ? "0 4px 20px rgba(200,168,233,0.3)" : "0 4px 20px rgba(180,100,110,0.25)" }}>
                             {moodLoadingMore ? "Loading..." : `Load More ${selectedMood.emoji} (+25)`}
                           </motion.button>
-                          <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "12px", marginTop: 8 }}>Showing {moodAnime.length} anime</p>
+                          <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: "12px", marginTop: 8 }}>Showing {moodAnime.length} anime</p>
                         </div>
                       )}
                     </>
@@ -340,7 +376,7 @@ export default function Home({ user, onLogout }) {
 
             {/* Netflix rows */}
             {!searchResults && (
-              <div style={{ background: isDark ? "#020818" : "#fff0f5", paddingTop: "clamp(20px, 4vw, 40px)" }}>
+              <div style={{ background: isDark ? "#020818" : "#faf6f2", paddingTop: "clamp(20px, 4vw, 40px)" }}>
                 <AnimeRow title="Trending Now" emoji="🔥" fetchFn={getTrending} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
                 <AnimeRow title="Top Rated" emoji="👑" fetchFn={getTopRated} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
                 <AnimeRow title="New Releases" emoji="🌟" fetchFn={getNewReleases} watchlist={watchlist} onAdd={handleAdd} onRate={handleRate} onNote={handleNote} notes={notes} onCardClick={handleCardClick} />
@@ -372,7 +408,7 @@ export default function Home({ user, onLogout }) {
       <AnimatePresence>
         {toast && (
           <motion.div initial={{ opacity: 0, y: 50, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            style={{ position: "fixed", bottom: "clamp(16px, 3vw, 32px)", left: "50%", transform: "translateX(-50%)", zIndex: 300, padding: "12px 24px", borderRadius: "20px", background: isDark ? "rgba(10,5,40,0.95)" : "rgba(255,240,245,0.95)", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)", color: isDark ? "#e8d5f5" : "#e91e8c", fontSize: "14px", fontWeight: "600", backdropFilter: "blur(20px)", boxShadow: "0 8px 30px rgba(0,0,0,0.2)", whiteSpace: "nowrap" }}>
+            style={{ position: "fixed", bottom: "clamp(16px, 3vw, 32px)", left: "50%", transform: "translateX(-50%)", zIndex: 300, padding: "12px 24px", borderRadius: "20px", background: isDark ? "rgba(10,5,40,0.95)" : "rgba(255,240,245,0.95)", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,130,140,0.25)", color: isDark ? "#e8d5f5" : "#b06070", fontSize: "14px", fontWeight: "600", backdropFilter: "blur(20px)", boxShadow: "0 8px 30px rgba(0,0,0,0.2)", whiteSpace: "nowrap" }}>
             {toast}
           </motion.div>
         )}

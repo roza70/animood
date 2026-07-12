@@ -37,7 +37,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
 
   const cardStyle = {
     background: isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.6)",
-    border: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(233,30,140,0.15)",
+    border: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(180,100,110,0.12)",
     borderRadius: "20px",
     backdropFilter: "blur(10px)",
   }
@@ -51,8 +51,8 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
         style={{
           display: "flex", gap: 14, alignItems: "center",
           padding: "12px 16px", borderRadius: "14px",
-          background: isDark ? "rgba(200,168,233,0.06)" : "rgba(233,30,140,0.04)",
-          border: isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(233,30,140,0.1)",
+          background: isDark ? "rgba(200,168,233,0.06)" : "rgba(180,100,110,0.04)",
+          border: isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(180,100,110,0.08)",
           position: "relative",
         }}
       >
@@ -65,7 +65,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
 
         <div onClick={() => onCardClick && onCardClick(anime)} style={{ flex: 1, minWidth: 0, cursor: "pointer" }}>
           <p style={{
-            color: isDark ? "#e8d5f5" : "#c2185b",
+            color: isDark ? "#e8d5f5" : "#7a4050",
             fontSize: "clamp(12px, 1.5vw, 14px)", fontWeight: "700",
             margin: "0 0 4px 0",
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
@@ -74,7 +74,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             {anime?.score && <span style={{ color: "#ffd700", fontSize: "11px", fontWeight: "600" }}>⭐ {anime.score}</span>}
-            {anime?.episodes && <span style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "11px" }}>{anime.episodes} eps</span>}
+            {anime?.episodes && <span style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: "11px" }}>{anime.episodes} eps</span>}
             {showRating && ratings[anime.mal_id] && (
               <span style={{
                 padding: "2px 10px", borderRadius: "10px",
@@ -109,7 +109,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                   position: "absolute", top: "110%", right: 0, zIndex: 50, minWidth: "160px",
                   background: isDark ? "rgba(10,5,40,0.98)" : "rgba(255,240,245,0.98)",
                   borderRadius: "12px", padding: "8px",
-                  border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.2)",
+                  border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,100,110,0.15)",
                   boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
                 }}
               >
@@ -149,10 +149,10 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
     <div style={{ padding: "clamp(16px, 4vw, 48px)", paddingTop: "clamp(80px, 10vw, 100px)" }}>
 
       <div style={{ marginBottom: "clamp(20px, 4vw, 36px)" }}>
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(22px, 4vw, 36px)", fontWeight: "bold", color: isDark ? "#e8d5f5" : "#e91e8c", margin: "0 0 8px 0" }}>
+        <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(22px, 4vw, 36px)", fontWeight: "bold", color: isDark ? "#e8d5f5" : "#b06070", margin: "0 0 8px 0" }}>
           ✦ My Anime List
         </h1>
-        <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "14px", margin: 0 }}>
+        <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: "14px", margin: 0 }}>
           {watchlist.length} total · {ratedAnime.length} rated · click status badge to change
         </p>
       </div>
@@ -160,7 +160,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
       {/* Tabs */}
       <div style={{
         display: "flex", gap: 8, marginBottom: "clamp(20px, 4vw, 32px)",
-        borderBottom: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(233,30,140,0.15)",
+        borderBottom: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(180,100,110,0.12)",
         overflowX: "auto", scrollbarWidth: "none",
       }}>
         {[
@@ -176,14 +176,14 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
               borderRadius: "12px 12px 0 0",
               border: "none", cursor: "pointer",
               fontSize: "clamp(11px, 1.4vw, 13px)", fontWeight: "600",
-              background: activeTab === tab.id ? isDark ? "rgba(200,168,233,0.2)" : "rgba(233,30,140,0.1)" : "transparent",
-              color: activeTab === tab.id ? isDark ? "#e8d5f5" : "#e91e8c" : isDark ? "#9b7fbf" : "#f06292",
-              borderBottom: activeTab === tab.id ? `2px solid ${isDark ? "#c8a8e9" : "#e91e8c"}` : "2px solid transparent",
+              background: activeTab === tab.id ? isDark ? "rgba(200,168,233,0.2)" : "rgba(180,100,110,0.07)" : "transparent",
+              color: activeTab === tab.id ? isDark ? "#e8d5f5" : "#b06070" : isDark ? "#9b7fbf" : "#b06070",
+              borderBottom: activeTab === tab.id ? `2px solid ${isDark ? "#c8a8e9" : "#b06070"}` : "2px solid transparent",
               transition: "background 0.2s", whiteSpace: "nowrap",
             }}
           >
             {tab.label} {tab.count !== null && (
-              <span style={{ marginLeft: 6, padding: "2px 8px", borderRadius: "10px", fontSize: "11px", background: isDark ? "rgba(200,168,233,0.2)" : "rgba(233,30,140,0.15)", color: isDark ? "#c8a8e9" : "#e91e8c" }}>
+              <span style={{ marginLeft: 6, padding: "2px 8px", borderRadius: "10px", fontSize: "11px", background: isDark ? "rgba(200,168,233,0.2)" : "rgba(180,100,110,0.1)", color: isDark ? "#c8a8e9" : "#b06070" }}>
                 {tab.count}
               </span>
             )}
@@ -198,7 +198,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
             {byStatus(s.key).length === 0 ? (
               <div style={{ textAlign: "center", padding: "60px 0" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>{s.emoji}</div>
-                <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: 16 }}>No anime in "{s.label}" yet!</p>
+                <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: 16 }}>No anime in "{s.label}" yet!</p>
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -218,10 +218,10 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
                 onClick={() => setActiveTier("all")}
                 style={{
                   padding: "8px 16px", borderRadius: "20px",
-                  background: activeTier === "all" ? isDark ? "rgba(200,168,233,0.3)" : "rgba(233,30,140,0.2)" : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.5)",
-                  color: isDark ? "#e8d5f5" : "#e91e8c",
+                  background: activeTier === "all" ? isDark ? "rgba(200,168,233,0.3)" : "rgba(180,100,110,0.14)" : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.5)",
+                  color: isDark ? "#e8d5f5" : "#b06070",
                   fontSize: "13px", fontWeight: "600", cursor: "pointer",
-                  border: isDark ? "1px solid rgba(200,168,233,0.2)" : "1px solid rgba(233,30,140,0.2)",
+                  border: isDark ? "1px solid rgba(200,168,233,0.2)" : "1px solid rgba(180,100,110,0.15)",
                 }}
               >All Rated</button>
               {RATING_TIERS.map(tier => (
@@ -240,7 +240,7 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
             {filteredRated.length === 0 ? (
               <div style={{ textAlign: "center", padding: "60px 0" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>⭐</div>
-                <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: 16 }}>No anime rated in this tier!</p>
+                <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: 16 }}>No anime rated in this tier!</p>
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -259,14 +259,14 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
             {/* Summary cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 14, marginBottom: 32 }}>
               {[
-                { label: "Total Anime", value: watchlist.length, emoji: "📚", color: isDark ? "#c8a8e9" : "#e91e8c" },
+                { label: "Total Anime", value: watchlist.length, emoji: "📚", color: isDark ? "#c8a8e9" : "#b06070" },
                 { label: "Total Rated", value: ratedAnime.length, emoji: "⭐", color: "#ffd700" },
                 ...STATUSES.map(s => ({ label: s.label, value: byStatus(s.key).length, emoji: s.emoji, color: s.color })),
               ].map((stat) => (
                 <div key={stat.label} style={{ ...cardStyle, padding: "clamp(14px, 2.5vw, 20px)", textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 6 }}>{stat.emoji}</div>
                   <div style={{ fontSize: "clamp(22px, 3vw, 30px)", fontWeight: "800", color: stat.color, fontFamily: "Georgia, serif" }}>{stat.value}</div>
-                  <div style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "clamp(10px, 1.3vw, 12px)", fontWeight: "600", marginTop: 4 }}>{stat.label}</div>
+                  <div style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: "clamp(10px, 1.3vw, 12px)", fontWeight: "600", marginTop: 4 }}>{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -276,11 +276,11 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
 
               {/* Pie chart - status breakdown */}
               <div style={{ ...cardStyle, padding: "clamp(16px, 3vw, 24px)" }}>
-                <h3 style={{ fontFamily: "Georgia, serif", color: isDark ? "#e8d5f5" : "#c2185b", fontSize: "clamp(14px, 2vw, 18px)", margin: "0 0 16px 0" }}>
+                <h3 style={{ fontFamily: "Georgia, serif", color: isDark ? "#e8d5f5" : "#7a4050", fontSize: "clamp(14px, 2vw, 18px)", margin: "0 0 16px 0" }}>
                   📊 Status Breakdown
                 </h3>
                 {pieData.length === 0 ? (
-                  <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: 13, textAlign: "center", padding: "40px 0" }}>No anime added yet!</p>
+                  <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: 13, textAlign: "center", padding: "40px 0" }}>No anime added yet!</p>
                 ) : (
                   <ResponsiveContainer width="100%" height={260}>
                     <PieChart>
@@ -297,16 +297,16 @@ export default function MyList({ user, watchlist, ratings, statuses, onAdd, onRa
 
               {/* Bar chart - ratings */}
               <div style={{ ...cardStyle, padding: "clamp(16px, 3vw, 24px)" }}>
-                <h3 style={{ fontFamily: "Georgia, serif", color: isDark ? "#e8d5f5" : "#c2185b", fontSize: "clamp(14px, 2vw, 18px)", margin: "0 0 16px 0" }}>
+                <h3 style={{ fontFamily: "Georgia, serif", color: isDark ? "#e8d5f5" : "#7a4050", fontSize: "clamp(14px, 2vw, 18px)", margin: "0 0 16px 0" }}>
                   ⭐ Rating Distribution
                 </h3>
                 {ratedAnime.length === 0 ? (
-                  <p style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: 13, textAlign: "center", padding: "40px 0" }}>No anime rated yet!</p>
+                  <p style={{ color: isDark ? "#9b7fbf" : "#b06070", fontSize: 13, textAlign: "center", padding: "40px 0" }}>No anime rated yet!</p>
                 ) : (
                   <ResponsiveContainer width="100%" height={260}>
                     <BarChart data={ratingBarData}>
-                      <XAxis dataKey="name" tick={{ fontSize: 10, fill: isDark ? "#9b7fbf" : "#f06292" }} interval={0} angle={-20} textAnchor="end" height={60} />
-                      <YAxis tick={{ fontSize: 11, fill: isDark ? "#9b7fbf" : "#f06292" }} allowDecimals={false} />
+                      <XAxis dataKey="name" tick={{ fontSize: 10, fill: isDark ? "#9b7fbf" : "#b06070" }} interval={0} angle={-20} textAnchor="end" height={60} />
+                      <YAxis tick={{ fontSize: 11, fill: isDark ? "#9b7fbf" : "#b06070" }} allowDecimals={false} />
                       <Tooltip contentStyle={{ background: isDark ? "rgba(10,5,40,0.95)" : "rgba(255,255,255,0.95)", border: "none", borderRadius: "10px", color: isDark ? "#e8d5f5" : "#333" }} />
                       <Bar dataKey="count" radius={[8, 8, 0, 0]}>
                         {ratingBarData.map((entry, i) => (

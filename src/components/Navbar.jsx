@@ -27,76 +27,89 @@ export default function Navbar({ user, onLogout, onSearch, onMyList, onBrowse, o
     } catch (err) { console.error(err) }
   }
 
+  const navBg = scrolled
+    ? isDark ? "rgba(2,8,24,0.97)" : "rgba(250,246,242,0.97)"
+    : "linear-gradient(to bottom, rgba(0,0,0,0.55), transparent)"
+
+  const linkColor = scrolled
+    ? isDark ? "#c8a8e9" : "#7a4050"
+    : "white"
+
   return (
-    <nav style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      padding: "clamp(8px,2vw,14px) clamp(12px,4vw,48px)",
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      background: scrolled ? isDark ? "rgba(2,8,24,0.97)" : "rgba(255,240,245,0.97)" : "linear-gradient(to bottom,rgba(0,0,0,0.6),transparent)",
-      backdropFilter: scrolled ? "blur(20px)" : "none",
-      borderBottom: scrolled ? isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(244,167,185,0.2)" : "none",
-      transition: "all 0.4s", gap: 8,
-    }}>
-      {/* Logo */}
-      <motion.div whileHover={{ scale: 1.05 }} onClick={() => onHome && onHome()} style={{ cursor: "pointer", flexShrink: 0 }}>
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(16px,3vw,24px)", fontWeight: "bold", color: isDark ? "#e8d5f5" : "white", textShadow: "0 2px 8px rgba(0,0,0,0.5)", margin: 0, whiteSpace: "nowrap" }}>
-          ✦ AniMood
-        </h1>
-      </motion.div>
+    <>
+      <nav style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+        padding: "clamp(10px,2vw,16px) clamp(16px,4vw,48px)",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        background: navBg,
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled ? isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(180,130,130,0.15)" : "none",
+        transition: "all 0.4s", gap: 12,
+      }}>
+        {/* Logo */}
+        <motion.div whileHover={{ scale: 1.05 }} onClick={() => onHome && onHome()} style={{ cursor: "pointer", flexShrink: 0 }}>
+          <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(18px,3vw,26px)", fontWeight: "bold", color: scrolled ? isDark ? "#e8d5f5" : "#7a4050" : "white", textShadow: scrolled ? "none" : "0 2px 8px rgba(0,0,0,0.6)", margin: 0, whiteSpace: "nowrap" }}>
+            ✦ AniMood
+          </h1>
+        </motion.div>
 
-      {/* Desktop nav links */}
-      <div style={{ display: "flex", alignItems: "center", gap: "clamp(16px,3vw,28px)", flex: 1, justifyContent: "center" }}>
-        {[
-          { label: "Home", action: () => onHome && onHome() },
-          { label: "Browse", action: () => onBrowse && onBrowse() },
-          { label: "My List ♡", action: () => onMyList && onMyList(true) },
-        ].map(item => (
-          <motion.span key={item.label} onClick={item.action} whileHover={{ scale: 1.05 }}
-            style={{ color: isDark ? "#c8a8e9" : "white", fontSize: "14px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap", display: "none", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
-            className="md:block">
-            {item.label}
-          </motion.span>
-        ))}
-      </div>
+        {/* Desktop center links */}
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(20px,3vw,36px)", flex: 1, justifyContent: "center" }}>
+          {[
+            { label: "Home", action: () => onHome && onHome() },
+            { label: "Browse", action: () => onBrowse && onBrowse() },
+            { label: "My List ♡", action: () => onMyList && onMyList(true) },
+          ].map(item => (
+            <motion.span key={item.label} onClick={item.action} whileHover={{ scale: 1.05 }}
+              style={{ color: linkColor, fontSize: "clamp(13px,1.5vw,15px)", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", textShadow: scrolled ? "none" : "0 1px 4px rgba(0,0,0,0.5)", display: "none" }}
+              className="md:block">
+              {item.label}
+            </motion.span>
+          ))}
+        </div>
 
-      {/* Right side */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-        {/* Theme toggle */}
-        <motion.button onClick={toggleTheme} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.9 }}
-          style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "20px", padding: "6px 12px", cursor: "pointer", color: "white", fontSize: "clamp(11px,1.3vw,13px)", backdropFilter: "blur(10px)", whiteSpace: "nowrap" }}>
-          {isDark ? "🌸" : "🌙"}
-        </motion.button>
+        {/* Right controls */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          {/* Theme toggle */}
+          <motion.button onClick={toggleTheme} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.9 }}
+            style={{ background: scrolled ? isDark ? "rgba(200,168,233,0.15)" : "rgba(180,100,110,0.12)" : "rgba(255,255,255,0.2)", border: scrolled ? isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,100,110,0.25)" : "1px solid rgba(255,255,255,0.4)", borderRadius: "20px", padding: "6px 12px", cursor: "pointer", color: scrolled ? isDark ? "#c8a8e9" : "#7a4050" : "white", fontSize: "13px", backdropFilter: "blur(10px)", whiteSpace: "nowrap" }}>
+            {isDark ? "🌸 Sakura" : "🌙 Night"}
+          </motion.button>
 
-        {/* Desktop logout */}
-        <motion.button onClick={onLogout} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-          style={{ padding: "6px 12px", borderRadius: "20px", border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.1)", color: "white", fontSize: "clamp(11px,1.3vw,13px)", cursor: "pointer", backdropFilter: "blur(10px)", display: "none" }}
-          className="md:block">
-          Logout
-        </motion.button>
+          {/* Desktop logout */}
+          <motion.button onClick={onLogout} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+            className="md:block"
+            style={{ padding: "6px 14px", borderRadius: "20px", border: scrolled ? isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,100,110,0.25)" : "1px solid rgba(255,255,255,0.4)", background: "transparent", color: scrolled ? isDark ? "#c8a8e9" : "#7a4050" : "white", fontSize: "13px", cursor: "pointer", display: "none", backdropFilter: "blur(10px)" }}>
+            Logout
+          </motion.button>
 
-        {/* Hamburger - mobile only, always visible */}
-        <motion.button
-          onClick={() => setMenuOpen(!menuOpen)}
-          whileTap={{ scale: 0.9 }}
-          style={{
-            background: menuOpen ? "rgba(200,168,233,0.4)" : "rgba(255,255,255,0.2)",
-            border: "2px solid rgba(255,255,255,0.6)",
-            borderRadius: "10px",
-            cursor: "pointer",
-            fontSize: "20px",
-            color: "white",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "6px 12px",
-            backdropFilter: "blur(10px)",
-            minWidth: 44,
-            textShadow: "0 1px 4px rgba(0,0,0,0.5)",
-          }}
-        >
-          {menuOpen ? "✕" : "☰"}
-        </motion.button>
-      </div>
+          {/* Hamburger - always visible on mobile */}
+          <motion.button
+            onClick={() => setMenuOpen(!menuOpen)}
+            whileTap={{ scale: 0.9 }}
+            className="md:hidden"
+            style={{
+              background: menuOpen
+                ? isDark ? "rgba(200,168,233,0.3)" : "rgba(180,100,110,0.25)"
+                : "rgba(255,255,255,0.25)",
+              border: "2px solid rgba(255,255,255,0.6)",
+              borderRadius: "12px",
+              cursor: "pointer",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "8px 14px",
+              backdropFilter: "blur(10px)",
+              fontSize: "18px",
+              fontWeight: "bold",
+              minWidth: 48,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            }}>
+            {menuOpen ? "✕" : "☰"}
+          </motion.button>
+        </div>
+      </nav>
 
       {/* Mobile dropdown */}
       <AnimatePresence>
@@ -106,54 +119,69 @@ export default function Navbar({ user, onLogout, onSearch, onMyList, onBrowse, o
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             style={{
-              position: "absolute", top: "100%", left: 0, right: 0,
-              background: isDark ? "rgba(2,8,24,0.99)" : "rgba(255,240,245,0.99)",
-              backdropFilter: "blur(20px)",
-              padding: "16px 20px",
-              display: "flex", flexDirection: "column", gap: 4,
-              borderBottom: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(233,30,140,0.15)",
-              zIndex: 200,
+              position: "fixed",
+              top: "clamp(52px,10vw,72px)",
+              left: 0, right: 0,
+              zIndex: 99,
+              background: isDark ? "rgba(2,8,24,0.99)" : "rgba(250,246,242,0.99)",
+              backdropFilter: "blur(24px)",
+              padding: "20px",
+              display: "flex", flexDirection: "column", gap: 6,
+              borderBottom: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(180,130,130,0.15)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
             }}
           >
-            {/* Search bar inside menu */}
-            <form onSubmit={handleSearch} style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+            {/* Search bar */}
+            <form onSubmit={handleSearch} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <input
                 type="text"
-                placeholder="Search anime..."
+                placeholder="Search any anime..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 style={{
-                  flex: 1, padding: "10px 14px", borderRadius: "12px",
-                  border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(233,30,140,0.3)",
-                  background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)",
-                  color: isDark ? "#e8d5f5" : "#c2185b",
+                  flex: 1, padding: "12px 16px", borderRadius: "14px",
+                  border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,130,130,0.25)",
+                  background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.9)",
+                  color: isDark ? "#e8d5f5" : "#5a3040",
                   fontSize: "14px", outline: "none",
                 }}
               />
-              <button type="submit" style={{ padding: "10px 16px", borderRadius: "12px", border: "none", background: isDark ? "rgba(200,168,233,0.3)" : "rgba(233,30,140,0.2)", color: isDark ? "#e8d5f5" : "#e91e8c", cursor: "pointer", fontSize: "16px" }}>🔍</button>
+              <button type="submit" style={{
+                padding: "12px 18px", borderRadius: "14px", border: "none",
+                background: isDark ? "linear-gradient(135deg,#7b1fa2,#c8a8e9)" : "linear-gradient(135deg,#b06070,#d4a0a8)",
+                color: "white", cursor: "pointer", fontSize: "16px",
+              }}>🔍</button>
             </form>
 
+            {/* Nav links */}
             {[
               { label: "🏠 Home", action: () => { onHome && onHome(); setMenuOpen(false) } },
-              { label: "🎭 Browse", action: () => { onBrowse && onBrowse(); setMenuOpen(false) } },
+              { label: "🎭 Browse All Anime", action: () => { onBrowse && onBrowse(); setMenuOpen(false) } },
               { label: "📋 My List", action: () => { onMyList && onMyList(true); setMenuOpen(false) } },
             ].map(item => (
               <motion.div key={item.label} onClick={item.action} whileTap={{ scale: 0.97 }}
-                style={{ color: isDark ? "#c8a8e9" : "#e91e8c", fontSize: "16px", fontWeight: "600", cursor: "pointer", padding: "12px 8px", borderRadius: "10px", borderBottom: isDark ? "1px solid rgba(200,168,233,0.08)" : "1px solid rgba(233,30,140,0.08)" }}>
+                style={{
+                  color: isDark ? "#c8a8e9" : "#7a4050",
+                  fontSize: "16px", fontWeight: "600", cursor: "pointer",
+                  padding: "14px 12px", borderRadius: "12px",
+                  background: isDark ? "rgba(200,168,233,0.05)" : "rgba(180,100,110,0.05)",
+                  border: isDark ? "1px solid rgba(200,168,233,0.08)" : "1px solid rgba(180,100,110,0.08)",
+                }}>
                 {item.label}
               </motion.div>
             ))}
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, paddingTop: 8 }}>
-              <span style={{ color: isDark ? "#9b7fbf" : "#f06292", fontSize: "13px" }}>✦ {user?.name}</span>
+            {/* User + logout */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, paddingTop: 12, borderTop: isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(180,100,110,0.1)" }}>
+              <span style={{ color: isDark ? "#9b7fbf" : "#9a7080", fontSize: "13px" }}>✦ {user?.name}</span>
               <motion.div onClick={() => { onLogout(); setMenuOpen(false) }} whileTap={{ scale: 0.97 }}
-                style={{ color: "#ef5350", fontSize: "14px", fontWeight: "600", cursor: "pointer", padding: "6px 12px", borderRadius: "8px", background: "rgba(239,83,80,0.1)" }}>
+                style={{ color: "#ef5350", fontSize: "14px", fontWeight: "600", cursor: "pointer", padding: "8px 16px", borderRadius: "10px", background: "rgba(239,83,80,0.1)", border: "1px solid rgba(239,83,80,0.2)" }}>
                 🚪 Logout
               </motion.div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   )
 }
