@@ -289,7 +289,7 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
 
         {/* ── TABS ── */}
         <div style={{ display: "flex", gap: 2, padding: "0 clamp(14px,3vw,24px)", borderBottom: isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(180,120,140,0.15)", overflowX: "auto", scrollbarWidth: "none" }}>
-          {["overview","characters","episodes","my notes"].map(tab => (
+          {["overview", "characters", "episodes", "my notes"].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={tabStyle(activeTab === tab)}>
               {tab === "overview" && "📖 "}{tab === "characters" && "👥 "}{tab === "episodes" && "🎬 "}{tab === "my notes" && "📝 "}
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -309,30 +309,30 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
                   <div style={{ flex: 1, minWidth: "200px" }}>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(110px,1fr))", gap: 10, marginBottom: 16 }}>
                       {[
-                        { label:"Score", value: anime?.score||"N/A", emoji:"⭐" },
-                        { label:"Ranked", value: anime?.rank?`#${anime.rank}`:"N/A", emoji:"🏆" },
-                        { label:"Popularity", value: anime?.popularity?`#${anime.popularity}`:"N/A", emoji:"📊" },
-                        { label:"Members", value: anime?.members?`${(anime.members/1000).toFixed(0)}K`:"N/A", emoji:"👥" },
-                        { label:"Episodes", value: anime?.episodes||"?", emoji:"🎬" },
-                        { label:"Type", value: anime?.type||"N/A", emoji:"📺" },
-                        { label:"Season", value: anime?.season?`${anime.season} ${anime.year}`:"N/A", emoji:"🗓️" },
-                        { label:"Studio", value: anime?.studios?.[0]?.name||"N/A", emoji:"🏢" },
-                      ].map((stat,i) => (
-                        <div key={i} style={{ padding:"10px 12px", borderRadius:"12px", background: isDark?"rgba(200,168,233,0.08)":"rgba(160,100,120,0.06)", border: isDark?"1px solid rgba(200,168,233,0.1)":"1px solid rgba(180,120,140,0.12)" }}>
-                          <div style={{ fontSize:"16px", marginBottom:3 }}>{stat.emoji}</div>
-                          <div style={{ color: isDark?"#e8d5f5":"#6a3050", fontSize:"clamp(11px,1.5vw,13px)", fontWeight:"700" }}>{stat.value}</div>
-                          <div style={{ color: isDark?"#9b7fbf":"#a06080", fontSize:"10px" }}>{stat.label}</div>
+                        { label: "Score", value: anime?.score || "N/A", emoji: "⭐" },
+                        { label: "Ranked", value: anime?.rank ? `#${anime.rank}` : "N/A", emoji: "🏆" },
+                        { label: "Popularity", value: anime?.popularity ? `#${anime.popularity}` : "N/A", emoji: "📊" },
+                        { label: "Members", value: anime?.members ? `${(anime.members / 1000).toFixed(0)}K` : "N/A", emoji: "👥" },
+                        { label: "Episodes", value: anime?.episodes || "?", emoji: "🎬" },
+                        { label: "Type", value: anime?.type || "N/A", emoji: "📺" },
+                        { label: "Season", value: anime?.season ? `${anime.season} ${anime.year}` : "N/A", emoji: "🗓️" },
+                        { label: "Studio", value: anime?.studios?.[0]?.name || "N/A", emoji: "🏢" },
+                      ].map((stat, i) => (
+                        <div key={i} style={{ padding: "10px 12px", borderRadius: "12px", background: isDark ? "rgba(200,168,233,0.08)" : "rgba(160,100,120,0.06)", border: isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(180,120,140,0.12)" }}>
+                          <div style={{ fontSize: "16px", marginBottom: 3 }}>{stat.emoji}</div>
+                          <div style={{ color: isDark ? "#e8d5f5" : "#6a3050", fontSize: "clamp(11px,1.5vw,13px)", fontWeight: "700" }}>{stat.value}</div>
+                          <div style={{ color: isDark ? "#9b7fbf" : "#a06080", fontSize: "10px" }}>{stat.label}</div>
                         </div>
                       ))}
                     </div>
-                    <h3 style={{ fontFamily:"Georgia,serif", color: isDark?"#e8d5f5":"#6a3050", fontSize:"clamp(13px,1.8vw,16px)", margin:"0 0 10px 0" }}>Synopsis</h3>
-                    <p style={{ color: isDark?"rgba(232,213,245,0.85)":"#5a3050", fontSize:"clamp(12px,1.5vw,14px)", lineHeight:1.7, margin:0 }}>{anime?.synopsis||"No synopsis available."}</p>
+                    <h3 style={{ fontFamily: "Georgia,serif", color: isDark ? "#e8d5f5" : "#6a3050", fontSize: "clamp(13px,1.8vw,16px)", margin: "0 0 10px 0" }}>Synopsis</h3>
+                    <p style={{ color: isDark ? "rgba(232,213,245,0.85)" : "#5a3050", fontSize: "clamp(12px,1.5vw,14px)", lineHeight: 1.7, margin: 0 }}>{anime?.synopsis || "No synopsis available."}</p>
                     {anime?.streaming?.length > 0 && (
-                      <div style={{ marginTop:16 }}>
-                        <h3 style={{ fontFamily:"Georgia,serif", color: isDark?"#e8d5f5":"#6a3050", fontSize:"clamp(13px,1.8vw,16px)", margin:"0 0 10px 0" }}>📺 Where to Watch</h3>
-                        <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                          {anime.streaming.map((s,i) => (
-                            <a key={i} href={s.url} target="_blank" rel="noreferrer" style={{ padding:"6px 14px", borderRadius:"12px", background: isDark?"rgba(200,168,233,0.15)":"rgba(160,100,120,0.1)", color: isDark?"#c8a8e9":"#8a4060", fontSize:"12px", fontWeight:"600", textDecoration:"none" }}>{s.name}</a>
+                      <div style={{ marginTop: 16 }}>
+                        <h3 style={{ fontFamily: "Georgia,serif", color: isDark ? "#e8d5f5" : "#6a3050", fontSize: "clamp(13px,1.8vw,16px)", margin: "0 0 10px 0" }}>📺 Where to Watch</h3>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          {anime.streaming.map((s, i) => (
+                            <a key={i} href={s.url} target="_blank" rel="noreferrer" style={{ padding: "6px 14px", borderRadius: "12px", background: isDark ? "rgba(200,168,233,0.15)" : "rgba(160,100,120,0.1)", color: isDark ? "#c8a8e9" : "#8a4060", fontSize: "12px", fontWeight: "600", textDecoration: "none" }}>{s.name}</a>
                           ))}
                         </div>
                       </div>
@@ -344,23 +344,23 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
 
             {/* Characters */}
             {activeTab === "characters" && (
-              <motion.div key={`chars-${currentId}`} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+              <motion.div key={`chars-${currentId}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 {characters.length === 0 ? (
-                  <div style={{ textAlign:"center", padding:"40px", color: isDark?"#9b7fbf":"#a06080" }}>Loading characters...</div>
+                  <div style={{ textAlign: "center", padding: "40px", color: isDark ? "#9b7fbf" : "#a06080" }}>Loading characters...</div>
                 ) : (
-                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                    {characters.map((char,i) => (
-                      <motion.div key={char.character.mal_id} initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }} transition={{ delay:i*0.04 }}
-                        style={{ display:"flex", gap:14, alignItems:"center", padding:"12px 16px", borderRadius:"14px", background: isDark?"rgba(200,168,233,0.06)":"rgba(160,100,120,0.04)", border: isDark?"1px solid rgba(200,168,233,0.1)":"1px solid rgba(180,120,140,0.12)" }}>
-                        <img src={char.character.images?.jpg?.image_url} alt={char.character.name} style={{ width:56, height:56, borderRadius:"50%", objectFit:"cover", flexShrink:0, border: isDark?"2px solid rgba(200,168,233,0.3)":"2px solid rgba(180,120,140,0.3)" }} />
-                        <div style={{ flex:1 }}>
-                          <p style={{ color: isDark?"#e8d5f5":"#6a3050", fontSize:"clamp(12px,1.5vw,14px)", fontWeight:"700", margin:"0 0 3px 0" }}>{char.character.name}</p>
-                          <p style={{ color: isDark?"#9b7fbf":"#a06080", fontSize:"11px", margin:"0 0 3px 0" }}>{char.role}</p>
-                          {char.voice_actors?.[0] && <p style={{ color: isDark?"#7b6090":"#b08090", fontSize:"11px", margin:0 }}>🎙 {char.voice_actors[0].person.name} ({char.voice_actors[0].language})</p>}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {characters.map((char, i) => (
+                      <motion.div key={char.character.mal_id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
+                        style={{ display: "flex", gap: 14, alignItems: "center", padding: "12px 16px", borderRadius: "14px", background: isDark ? "rgba(200,168,233,0.06)" : "rgba(160,100,120,0.04)", border: isDark ? "1px solid rgba(200,168,233,0.1)" : "1px solid rgba(180,120,140,0.12)" }}>
+                        <img src={char.character.images?.jpg?.image_url} alt={char.character.name} style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: isDark ? "2px solid rgba(200,168,233,0.3)" : "2px solid rgba(180,120,140,0.3)" }} />
+                        <div style={{ flex: 1 }}>
+                          <p style={{ color: isDark ? "#e8d5f5" : "#6a3050", fontSize: "clamp(12px,1.5vw,14px)", fontWeight: "700", margin: "0 0 3px 0" }}>{char.character.name}</p>
+                          <p style={{ color: isDark ? "#9b7fbf" : "#a06080", fontSize: "11px", margin: "0 0 3px 0" }}>{char.role}</p>
+                          {char.voice_actors?.[0] && <p style={{ color: isDark ? "#7b6090" : "#b08090", fontSize: "11px", margin: 0 }}>🎙 {char.voice_actors[0].person.name} ({char.voice_actors[0].language})</p>}
                         </div>
-                        {char.favorites > 0 && <div style={{ color:"#ffd700", fontSize:"11px", fontWeight:"700", flexShrink:0 }}>♥ {char.favorites?.toLocaleString()}</div>}
+                        {char.favorites > 0 && <div style={{ color: "#ffd700", fontSize: "11px", fontWeight: "700", flexShrink: 0 }}>♥ {char.favorites?.toLocaleString()}</div>}
                         {char.voice_actors?.[0]?.person?.images?.jpg?.image_url && (
-                          <img src={char.voice_actors[0].person.images.jpg.image_url} alt={char.voice_actors[0].person.name} style={{ width:40, height:40, borderRadius:"50%", objectFit:"cover", flexShrink:0, opacity:0.7 }} />
+                          <img src={char.voice_actors[0].person.images.jpg.image_url} alt={char.voice_actors[0].person.name} style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0, opacity: 0.7 }} />
                         )}
                       </motion.div>
                     ))}
@@ -371,35 +371,35 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
 
             {/* Episodes */}
             {activeTab === "episodes" && (
-              <motion.div key={`eps-${currentId}`} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+              <motion.div key={`eps-${currentId}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 {episodes.length === 0 && !loadingEps ? (
-                  <div style={{ textAlign:"center", padding:"40px", color: isDark?"#9b7fbf":"#a06080" }}>No episode data available.</div>
+                  <div style={{ textAlign: "center", padding: "40px", color: isDark ? "#9b7fbf" : "#a06080" }}>No episode data available.</div>
                 ) : (
                   <>
-                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                      {episodes.map((ep,i) => (
-                        <motion.div key={ep.mal_id} initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:Math.min(i*0.02,0.3) }}
-                          style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 16px", borderRadius:"12px", background: episodeRatings[ep.mal_id]?isDark?"rgba(200,168,233,0.1)":"rgba(160,100,120,0.07)":isDark?"rgba(200,168,233,0.04)":"rgba(160,100,120,0.03)", border: episodeRatings[ep.mal_id]?isDark?"1px solid rgba(200,168,233,0.25)":"1px solid rgba(180,120,140,0.3)":isDark?"1px solid rgba(200,168,233,0.07)":"1px solid rgba(180,120,140,0.1)" }}>
-                          <div style={{ color: isDark?"#c8a8e9":"#8a4060", fontSize:"11px", fontWeight:"800", flexShrink:0, minWidth:36 }}>EP {ep.mal_id}</div>
-                          <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ color: isDark?"#e8d5f5":"#5a3050", fontSize:"clamp(12px,1.5vw,13px)", fontWeight:"600", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{ep.title||`Episode ${ep.mal_id}`}</div>
-                            {ep.score && <div style={{ color:"#ffd700", fontSize:"10px", marginTop:2 }}>⭐ {ep.score}</div>}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {episodes.map((ep, i) => (
+                        <motion.div key={ep.mal_id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: Math.min(i * 0.02, 0.3) }}
+                          style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderRadius: "12px", background: episodeRatings[ep.mal_id] ? isDark ? "rgba(200,168,233,0.1)" : "rgba(160,100,120,0.07)" : isDark ? "rgba(200,168,233,0.04)" : "rgba(160,100,120,0.03)", border: episodeRatings[ep.mal_id] ? isDark ? "1px solid rgba(200,168,233,0.25)" : "1px solid rgba(180,120,140,0.3)" : isDark ? "1px solid rgba(200,168,233,0.07)" : "1px solid rgba(180,120,140,0.1)" }}>
+                          <div style={{ color: isDark ? "#c8a8e9" : "#8a4060", fontSize: "11px", fontWeight: "800", flexShrink: 0, minWidth: 36 }}>EP {ep.mal_id}</div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ color: isDark ? "#e8d5f5" : "#5a3050", fontSize: "clamp(12px,1.5vw,13px)", fontWeight: "600", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ep.title || `Episode ${ep.mal_id}`}</div>
+                            {ep.score && <div style={{ color: "#ffd700", fontSize: "10px", marginTop: 2 }}>⭐ {ep.score}</div>}
                           </div>
                           {editingEp === ep.mal_id ? (
-                            <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
                               <input autoFocus type="number" min="1" max="10" value={editRatingValue}
                                 onChange={e => setEditRatingValue(e.target.value)}
-                                onKeyDown={e => { if (e.key==="Enter") saveEpRating(ep.mal_id,editRatingValue); if (e.key==="Escape") { setEditingEp(null); setEditRatingValue("") } }}
+                                onKeyDown={e => { if (e.key === "Enter") saveEpRating(ep.mal_id, editRatingValue); if (e.key === "Escape") { setEditingEp(null); setEditRatingValue("") } }}
                                 placeholder="1-10"
-                                style={{ width:54, padding:"5px 8px", borderRadius:"8px", border: isDark?"1px solid rgba(200,168,233,0.4)":"1px solid rgba(180,120,140,0.4)", background: isDark?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.9)", color: isDark?"#e8d5f5":"#5a3050", fontSize:"14px", outline:"none", textAlign:"center" }} />
-                              <button onClick={() => saveEpRating(ep.mal_id,editRatingValue)}
-                                style={{ padding:"5px 10px", borderRadius:"8px", border:"none", background: isDark?"rgba(200,168,233,0.3)":"rgba(160,100,120,0.2)", color: isDark?"#e8d5f5":"#8a4060", fontSize:"12px", fontWeight:"700", cursor:"pointer" }}>✓</button>
+                                style={{ width: 54, padding: "5px 8px", borderRadius: "8px", border: isDark ? "1px solid rgba(200,168,233,0.4)" : "1px solid rgba(180,120,140,0.4)", background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.9)", color: isDark ? "#e8d5f5" : "#5a3050", fontSize: "14px", outline: "none", textAlign: "center" }} />
+                              <button onClick={() => saveEpRating(ep.mal_id, editRatingValue)}
+                                style={{ padding: "5px 10px", borderRadius: "8px", border: "none", background: isDark ? "rgba(200,168,233,0.3)" : "rgba(160,100,120,0.2)", color: isDark ? "#e8d5f5" : "#8a4060", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}>✓</button>
                               <button onClick={() => { setEditingEp(null); setEditRatingValue("") }}
-                                style={{ padding:"5px 8px", borderRadius:"8px", border:"none", background:"transparent", color: isDark?"#9b7fbf":"#a06080", fontSize:"12px", cursor:"pointer" }}>✕</button>
+                                style={{ padding: "5px 8px", borderRadius: "8px", border: "none", background: "transparent", color: isDark ? "#9b7fbf" : "#a06080", fontSize: "12px", cursor: "pointer" }}>✕</button>
                             </div>
                           ) : (
-                            <button onClick={() => { setEditingEp(ep.mal_id); setEditRatingValue(episodeRatings[ep.mal_id]?.toString()||"") }}
-                              style={{ padding:"5px 14px", borderRadius:"10px", border:"none", flexShrink:0, background: episodeRatings[ep.mal_id]?isDark?"rgba(200,168,233,0.2)":"rgba(160,100,120,0.15)":isDark?"rgba(200,168,233,0.07)":"rgba(160,100,120,0.06)", color: episodeRatings[ep.mal_id]?isDark?"#e8d5f5":"#8a4060":isDark?"#9b7fbf":"#a06080", fontSize:"12px", fontWeight:"600", cursor:"pointer" }}>
+                            <button onClick={() => { setEditingEp(ep.mal_id); setEditRatingValue(episodeRatings[ep.mal_id]?.toString() || "") }}
+                              style={{ padding: "5px 14px", borderRadius: "10px", border: "none", flexShrink: 0, background: episodeRatings[ep.mal_id] ? isDark ? "rgba(200,168,233,0.2)" : "rgba(160,100,120,0.15)" : isDark ? "rgba(200,168,233,0.07)" : "rgba(160,100,120,0.06)", color: episodeRatings[ep.mal_id] ? isDark ? "#e8d5f5" : "#8a4060" : isDark ? "#9b7fbf" : "#a06080", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}>
                               {episodeRatings[ep.mal_id] ? `${episodeRatings[ep.mal_id]}/10` : "Rate"}
                             </button>
                           )}
@@ -407,9 +407,9 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
                       ))}
                     </div>
                     {hasMoreEps && (
-                      <div style={{ textAlign:"center", marginTop:20 }}>
-                        <button onClick={() => loadEps(currentId, episodePage+1)}
-                          style={{ padding:"10px 28px", borderRadius:"20px", border: isDark?"2px solid rgba(200,168,233,0.3)":"2px solid rgba(180,120,140,0.3)", background:"transparent", color: isDark?"#c8a8e9":"#8a4060", fontSize:"13px", fontWeight:"700", cursor:"pointer" }}>
+                      <div style={{ textAlign: "center", marginTop: 20 }}>
+                        <button onClick={() => loadEps(currentId, episodePage + 1)}
+                          style={{ padding: "10px 28px", borderRadius: "20px", border: isDark ? "2px solid rgba(200,168,233,0.3)" : "2px solid rgba(180,120,140,0.3)", background: "transparent", color: isDark ? "#c8a8e9" : "#8a4060", fontSize: "13px", fontWeight: "700", cursor: "pointer" }}>
                           {loadingEps ? "Loading..." : "+ Load More Episodes"}
                         </button>
                       </div>
@@ -421,22 +421,22 @@ export default function AnimeDetail({ anime: initialAnime, onClose, onAdd, onRat
 
             {/* Notes */}
             {activeTab === "my notes" && (
-              <motion.div key="notes" initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-                <h3 style={{ fontFamily:"Georgia,serif", color: isDark?"#e8d5f5":"#6a3050", fontSize:"clamp(14px,2vw,18px)", margin:"0 0 16px 0" }}>
-                  📝 How did you feel about {anime?.title_english||anime?.title}?
+              <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <h3 style={{ fontFamily: "Georgia,serif", color: isDark ? "#e8d5f5" : "#6a3050", fontSize: "clamp(14px,2vw,18px)", margin: "0 0 16px 0" }}>
+                  📝 How did you feel about {anime?.title_english || anime?.title}?
                 </h3>
                 <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Write your thoughts, feelings, favorite moments..." rows={8}
-                  style={{ width:"100%", padding:"clamp(12px,2vw,16px)", borderRadius:"16px", border: isDark?"1px solid rgba(200,168,233,0.3)":"1px solid rgba(180,120,140,0.25)", background: isDark?"rgba(255,255,255,0.05)":"rgba(255,255,255,0.7)", color: isDark?"#e8d5f5":"#5a3050", fontSize:"clamp(13px,1.5vw,15px)", resize:"vertical", outline:"none", fontFamily:"Georgia,serif", lineHeight:1.7, boxSizing:"border-box" }} />
-                <div style={{ display:"flex", gap:10, marginTop:12, justifyContent:"flex-end" }}>
-                  <motion.button whileHover={{ scale:1.05 }} whileTap={{ scale:0.95 }} onClick={saveNote}
-                    style={{ padding:"10px 24px", borderRadius:"14px", border:"none", background: isDark?"linear-gradient(135deg,#7b1fa2,#c8a8e9)":"linear-gradient(135deg,#c06080,#e8a0b8)", color:"white", fontSize:"13px", fontWeight:"700", cursor:"pointer", fontFamily:"Georgia,serif" }}>
+                  style={{ width: "100%", padding: "clamp(12px,2vw,16px)", borderRadius: "16px", border: isDark ? "1px solid rgba(200,168,233,0.3)" : "1px solid rgba(180,120,140,0.25)", background: isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.7)", color: isDark ? "#e8d5f5" : "#5a3050", fontSize: "clamp(13px,1.5vw,15px)", resize: "vertical", outline: "none", fontFamily: "Georgia,serif", lineHeight: 1.7, boxSizing: "border-box" }} />
+                <div style={{ display: "flex", gap: 10, marginTop: 12, justifyContent: "flex-end" }}>
+                  <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={saveNote}
+                    style={{ padding: "10px 24px", borderRadius: "14px", border: "none", background: isDark ? "linear-gradient(135deg,#7b1fa2,#c8a8e9)" : "linear-gradient(135deg,#c06080,#e8a0b8)", color: "white", fontSize: "13px", fontWeight: "700", cursor: "pointer", fontFamily: "Georgia,serif" }}>
                     Save Note ✦
                   </motion.button>
                 </div>
                 {userNote && (
-                  <div style={{ marginTop:20, padding:"clamp(12px,2vw,16px)", borderRadius:"14px", background: isDark?"rgba(200,168,233,0.08)":"rgba(160,100,120,0.06)", border: isDark?"1px solid rgba(200,168,233,0.15)":"1px solid rgba(180,120,140,0.15)" }}>
-                    <p style={{ color: isDark?"#9b7fbf":"#a06080", fontSize:"11px", fontWeight:"700", margin:"0 0 8px 0", textTransform:"uppercase", letterSpacing:"1px" }}>Previously saved:</p>
-                    <p style={{ color: isDark?"#e8d5f5":"#5a3050", fontSize:"clamp(12px,1.5vw,14px)", fontStyle:"italic", lineHeight:1.6, margin:0 }}>"{userNote}"</p>
+                  <div style={{ marginTop: 20, padding: "clamp(12px,2vw,16px)", borderRadius: "14px", background: isDark ? "rgba(200,168,233,0.08)" : "rgba(160,100,120,0.06)", border: isDark ? "1px solid rgba(200,168,233,0.15)" : "1px solid rgba(180,120,140,0.15)" }}>
+                    <p style={{ color: isDark ? "#9b7fbf" : "#a06080", fontSize: "11px", fontWeight: "700", margin: "0 0 8px 0", textTransform: "uppercase", letterSpacing: "1px" }}>Previously saved:</p>
+                    <p style={{ color: isDark ? "#e8d5f5" : "#5a3050", fontSize: "clamp(12px,1.5vw,14px)", fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>"{userNote}"</p>
                   </div>
                 )}
               </motion.div>
