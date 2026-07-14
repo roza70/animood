@@ -124,8 +124,8 @@ function SakuraAmbient() {
     drift: (Math.random() - 0.5) * 120,
     color: i % 4 === 0 ? "rgba(255,182,193,0.75)"
       : i % 4 === 1 ? "rgba(255,204,213,0.7)"
-      : i % 4 === 2 ? "rgba(240,170,185,0.65)"
-      : "rgba(255,218,224,0.7)",
+        : i % 4 === 2 ? "rgba(240,170,185,0.65)"
+          : "rgba(255,218,224,0.7)",
   })), [])
 
   const windGusts = useMemo(() => Array.from({ length: 4 }, (_, i) => ({
