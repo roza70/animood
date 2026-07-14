@@ -4,42 +4,65 @@ const BASE = "https://api.jikan.moe/v4"
 const cache = {}
 const sleep = (ms) => new Promise(res => setTimeout(res, ms))
 
-const fetchWithCache = async (url, retries = 3) => {
+const fetchWithRetry = async (url, retries = 4) => {
   if (cache[url]) return cache[url]
   for (let i = 0; i < retries; i++) {
     try {
-      await sleep(i * 800)
+      if (i > 0) await sleep(i * 1000)
       const res = await axios.get(url)
-      if (res && res.data) { cache[url] = res; return res }
+      if (res?.data) { cache[url] = res; return res }
     } catch (err) {
-      if (err.response?.status === 429) { await sleep(2000 * (i + 1)); continue }
+      const status = err.response?.status
+      if (status === 429) { await sleep(2000 * (i + 1)); continue }
+      if (status === 504) { await sleep(1500 * (i + 1)); continue }
       if (i === retries - 1) throw err
     }
   }
 }
 
-export const getTrending = (page = 1) => fetchWithCache(`${BASE}/top/anime?filter=airing&limit=25&page=${page}`)
-export const getTopRated = (page = 1) => fetchWithCache(`${BASE}/top/anime?filter=bypopularity&limit=25&page=${page}`)
-export const getNewReleases = (page = 1) => fetchWithCache(`${BASE}/seasons/now?limit=25&page=${page}`)
-export const getAnimeById = (id) => fetchWithCache(`${BASE}/anime/${id}/full`)
-export const getAnimeCharacters = (id) => fetchWithCache(`${BASE}/anime/${id}/characters`)
-export const getAnimeEpisodes = (id, page = 1) => fetchWithCache(`${BASE}/anime/${id}/episodes?page=${page}`)
-export const getAnimeRelations = (id) => fetchWithCache(`${BASE}/anime/${id}/relations`)
-export const searchAnime = (query, page = 1) => axios.get(`${BASE}/anime?q=${encodeURIComponent(query)}&limit=25&page=${page}`)
+export const getTrending = (page = 1) =>
+  fetchWithRetry(`${BASE}/top/anime?filter=airing&limit=25&page=${page}`)
+
+export const getTopRated = (page = 1) =>
+  fetchWithRetry(`${BASE}/top/anime?filter=bypopularity&limit=25&page=${page}`)
+
+export const getNewReleases = (page = 1) =>
+  fetchWithRetry(`${BASE}/seasons/now?limit=25&page=${page}`)
+
+export const getAnimeById = (id) =>
+  fetchWithRetry(`${BASE}/anime/${id}/full`)
+
+export const getAnimeCharacters = (id) =>
+  fetchWithRetry(`${BASE}/anime/${id}/characters`)
+
+export const getAnimeEpisodes = (id, page = 1) =>
+  fetchWithRetry(`${BASE}/anime/${id}/episodes?page=${page}`)
+
+export const getAnimeRelations = (id) =>
+  fetchWithRetry(`${BASE}/anime/${id}/relations`)
+
+export const searchAnime = (query, page = 1) =>
+  axios.get(`${BASE}/anime?q=${encodeURIComponent(query)}&limit=25&page=${page}`)
+
+// Theme IDs in Jikan v4 use themes= param, genre IDs use genres= param
+const THEME_IDS = new Set([16, 17, 18, 19, 20, 21, 23, 31, 32, 35, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61])
 
 export const getByGenre = async (genreId, page = 1) => {
-  // Use genres param for genre IDs, themes param for theme IDs (16=Magic is a theme in Jikanv4)
-  const themeIds = [16, 17, 18, 19, 31, 32, 35, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61]
-  const isTheme = themeIds.includes(Number(genreId))
-  const param = isTheme ? "themes" : "genres"
-  const url = `${BASE}/anime?${param}=${genreId}&order_by=score&sort=desc&limit=25&page=${page}`
-  await sleep(400)
-  try {
-    const res = await axios.get(url)
-    return res
-  } catch (err) {
-    if (err.response?.status === 429) { await sleep(2500); return axios.get(url) }
-    throw err
+  const param = THEME_IDS.has(Number(genreId)) ? "themes" : "genres"
+  const url = `${BASE}/anime?${param}=${genreId}&order_by=score&sort=desc&limit=25&page=${page}&sfw=true`
+  await sleep(350)
+  for (let i = 0; i < 4; i++) {
+    try {
+      const res = await axios.get(url)
+      return res
+    } catch (err) {
+      const status = err.response?.status
+      if (status === 429 || status === 504) {
+        await sleep(2000 * (i + 1))
+        continue
+      }
+      throw err
+    }
   }
 }
 
@@ -58,19 +81,19 @@ export const GENRES = {
   supernatural: 37,
   thriller: 41,
   isekai: 62,
-  magic: 16,       // Theme ID 16 — now uses themes= param
-  mecha: 18,       // Theme ID 18
-  music: 19,       // Theme ID 19
+  magic: 16,
+  mecha: 18,
+  music: 19,
   psychological: 40,
-  vampire: 32,     // Theme ID 32
-  harem: 35,       // Theme ID 35
+  vampire: 32,
+  harem: 35,
   historical: 13,
-  military: 38,    // Theme ID 38
+  military: 38,
   demons: 6,
   game: 11,
-  parody: 20,      // Theme ID 20
-  samurai: 21,     // Theme ID 21
-  school: 23,      // Theme ID 23
+  parody: 20,
+  samurai: 21,
+  school: 23,
   space: 29,
   shounen: 27,
   shoujo: 25,
