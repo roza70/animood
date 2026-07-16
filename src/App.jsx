@@ -10,9 +10,7 @@ function AppContent() {
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#020818" }}>
-      <motion.h1
-        animate={{ opacity: [0.4, 1, 0.4] }}
-        transition={{ duration: 2, repeat: Infinity }}
+      <motion.h1 animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2, repeat: Infinity }}
         style={{ fontFamily: "Georgia, serif", fontSize: "32px", color: "#c8a8e9" }}>
         ✦ AniMood
       </motion.h1>
@@ -21,6 +19,7 @@ function AppContent() {
 
   return (
     <>
+      {/* Ambient effects always visible everywhere */}
       <AmbientEffects />
       <AnimatePresence mode="wait">
         {!user ? (
